@@ -30,7 +30,7 @@
         "symfony/monolog-bundle": "^2.11",
         "sensio/distribution-bundle": "^4.0",
         "sensio/framework-extra-bundle": "~3.0",
-        "incenteev/composer-parameter-handler": "~2.1",
+        "incenteev/composer-parameter-handler": "2.1.5",
         "jquery/jquery":  "1.10.*",
         "knplabs/knp-markdown-bundle": "~1.5",
         "enko/ics": "~0.2",
