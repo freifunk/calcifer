@@ -22,27 +22,27 @@
     "require": {
         "php": ">=5.6",
         "symfony/symfony": "^2.8",
-        "doctrine/doctrine-bundle": "^1.6",
-        "doctrine/orm": "^2.5",
-        "twig/extensions": "^1.3",
+        "doctrine/doctrine-bundle": "1.6.4",
+        "doctrine/orm": "2.5.5",
+        "twig/extensions": "1.4.1",
         "symfony/assetic-bundle": "^2.8",
         "symfony/swiftmailer-bundle": "^2.3",
         "symfony/monolog-bundle": "^2.11",
-        "sensio/distribution-bundle": "^4.0",
-        "sensio/framework-extra-bundle": "~3.0",
-        "incenteev/composer-parameter-handler": "~2.1",
+        "sensio/distribution-bundle": "4.0.12",
+        "sensio/framework-extra-bundle": "3.0.16",
+        "incenteev/composer-parameter-handler": "2.1.2",
         "jquery/jquery":  "1.10.*",
-        "knplabs/knp-markdown-bundle": "~1.5",
-        "enko/ics": "~0.2",
-        "jbroadway/urlify" : "^1.0",
+        "knplabs/knp-markdown-bundle": "1.5.1",
+        "enko/ics": "0.2.3",
+        "jbroadway/urlify" : "1.0.9-stable",
         "enko/relativedateparser" : "0.5",
-        "sabre/vobject": "^4.1"
+        "sabre/vobject": "4.1.1"
     },
     "require-dev": {
-        "sensio/generator-bundle": "~3.0",
-        "phpunit/phpunit": "^5.4",
-        "liip/functional-test-bundle": "^1.6",
-        "doctrine/doctrine-fixtures-bundle": "^2.3"
+        "sensio/generator-bundle": "3.1.1",
+        "phpunit/phpunit": "5.6.5",
+        "liip/functional-test-bundle": "1.6.3",
+        "doctrine/doctrine-fixtures-bundle": "2.3.0"
     },
     "scripts": {
         "post-root-package-install": [
