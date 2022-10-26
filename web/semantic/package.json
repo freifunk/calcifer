@@ -52,7 +52,7 @@
     "better-console": "*",
     "del": "^2.0.2",
     "extend": "^3.0.0",
-    "gulp": "^3.9.0",
+    "gulp": "^4.0.0",
     "gulp-autoprefixer": "^3.1.0",
     "gulp-chmod": "^1.2.0",
     "gulp-clone": "^1.0.0",
