@@ -1,0 +1,16 @@
+{% extends 'layout.html.twig' %}
+
+{% block body -%}
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    <p>Möchtest du die Veranstaltung <strong>„{{ entity.summary }}“</strong> zum Datum
+                        <strong>„{{ entity.startdate.format('Y-m-d H:i') }}“</strong> wirklich löschen?</p>
+                    <button name="confirmation" value="true" class="btn btn-danger">Ja</button>
+                    <a href="{{ path('_show', {'slug' : entity.slug }) }}" class="btn btn-success">Nein</a>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

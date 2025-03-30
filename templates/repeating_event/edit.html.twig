@@ -1,0 +1,16 @@
+{% extends 'layout.html.twig' %}
+
+{% block body -%}
+    <div class="container my-4">
+        <h1 class="text-success border-bottom pb-2">Wiederholenden Termin bearbeiten</h1>
+    </div>
+
+    <div class="container my-4">
+        <div class="card">
+            <div class="card-body">
+                {{ include('repeating_event/repeating_event_form.html.twig',{'entity':entity}) }}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

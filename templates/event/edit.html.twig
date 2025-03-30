@@ -1,0 +1,15 @@
+{% extends 'layout.html.twig' %}
+
+{% block body -%}
+    <div class="container mt-4">
+        <h1 class="display-4 text-success">Termin bearbeiten</h1>
+    </div>
+
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-body">
+                {{ include('event/event_form.html.twig',{'entity':entity}) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

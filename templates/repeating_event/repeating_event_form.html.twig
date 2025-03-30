@@ -1,0 +1,197 @@
+<form class="row g-3 needs-validation" method="post" novalidate
+      action="{% if entity.id|default(0) > 0 %}{{ path('repeating_event_update',{'slug':entity.slug}) }}{% else %}{{ path('repeating_event_create') }}{% endif %}">
+    <div class="form-floating mb-3">
+            <input type="datetime-local"
+                   id="event_nextdate"
+                   name="nextdate"
+                   required
+                   value="{{ entity.nextdate.format('Y-m-d H:i')|default('') }}"
+                   placeholder="{{ "now"|date('Y-m-d H:00') }}"
+                   class="form-control">
+            <label for="event_nextdate">Nächster Termin</label>
+            <div class="invalid-feedback">
+                Bitte gib ein gültiges Datum für den nächsten Termin an.
+            </div>
+        <small class="form-text text-muted">
+            Bitte gebe das Datum des nächsten Termin an.
+        </small>
+    </div>
+
+    <div class="form-floating mb-3">
+        <input type="number"
+               id="event_duration"
+               name="duration"
+               pattern="\d*"
+               placeholder="60"
+               value="{{ entity.duration|default('') }}"
+               class="form-control">
+        <div class="invalid-feedback">
+            Bitte gib eine gültige Dauer in Minuten an.
+        </div>
+        <label for="event_duration" class="form-label">Dauer</label>
+        <small class="form-text text-muted">
+            Hier gibst du bitte die Dauer der Veranstaltung in Minuten an.
+        </small>
+    </div>
+
+    <div class="form-floating mb-3">
+        <input type="text"
+               id="repeating_pattern"
+               name="repeating_pattern"
+               value="{{ entity.repeatingPattern|default('') }}"
+               required
+               placeholder="Erster Dienstag im Monat"
+               maxlength="255"
+               class="form-control">
+        <label for="repeating_pattern">Terminwiederholungsmuster</label>
+        <div class="invalid-feedback">
+            Bitte gib ein gültiges Wiederholungsmuster an.
+        </div>
+        <small class="form-text text-muted">
+            Gebe hier ein <a href="{{ path("repeating_patterns") }}">Wiederholungsmuster</a> an.
+        </small>
+    </div>
+
+    <div class="form-floating mb-3">
+        <input type="text"
+               id="event_summary"
+               name="summary"
+               value="{{ entity.summary|default('') }}"
+               required
+               placeholder="Zusammenfassung"
+               maxlength="255"
+               class="form-control">
+        <div class="invalid-feedback">
+            Bitte gib eine Zusammenfassung an.
+        </div>
+        <label for="event_summary">Zusammenfassung</label>
+    </div>
+
+    <div class="form-floating mb-3">
+        <textarea name="description" id="event_description" placeholder="Beschreibung" class="form-control">{{ entity.description|default('') }}</textarea>
+        <label for="event_description" class="form-label">Beschreibung</label>
+        <div class="invalid-feedback">
+            Bitte gib eine gültige Beschreibung an.
+        </div>
+        <small class="form-text text-muted">
+            Du kannst hier <a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a> benutzen.
+        </small>
+    </div>
+
+    <div class="input-group mb-3">
+    <div class="form-floating">
+            <input type="text"
+                   id="event_url"
+                   name="url"
+                   maxlength="255"
+                   pattern="https?://.*"
+                   value="{{ entity.url|default('') }}"
+                   placeholder="https://www.example.com"
+                   class="form-control">
+            <label for="event_url">URL</label>
+            <div class="invalid-feedback">
+                Bitte gib eine gültige URL an.
+            </div>
+        </div>
+            <span class="input-group-text"><i class="bi bi-globe"></i></span>
+    </div>
+
+    <div class="mb-3">
+        <div class="form-floating">
+            <input type="text"
+                   id="event_location"
+                   name="location"
+                   maxlength="255"
+                   data-required="true"
+                   value="{{ entity.location.name|default('') }}"
+                   class="form-control">
+            <label for="event_location">Ort</label>
+            <div class="invalid-feedback">
+                Bitte gib einen Ort an.
+            </div>
+        </div>
+        
+        <input type="hidden" id="location_lat" name="location_lat" value="{{ entity.location.lat|default('') }}">
+        <input type="hidden" id="location_lon" name="location_lon" value="{{ entity.location.lon|default('') }}">
+        
+        <div id="location_details" class="mt-2 {% if not entity.location.lat|default(0) > 0 %}d-none{% endif %}">
+            <div class="card">
+                <div class="card-body py-2">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-geo-alt me-2 text-primary"></i>
+                        <div>
+                            <div class="location-name">{{ entity.location.name|default('') }}</div>
+                            <small class="text-muted location-coordinates">
+                                {% if entity.location.lat|default(0) > 0 %}
+                                    Lat: {{ entity.location.lat }}, Lon: {{ entity.location.lon }}
+                                {% endif %}
+                            </small>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary ms-auto edit-on-map" title="Auf Karte bearbeiten">
+                            <i class="bi bi-map"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <small class="form-text text-muted mt-1">
+            Nach Orten suchen oder <a href="#" class="add_geo">auf der Karte auswählen</a> (JavaScript erforderlich).
+        </small>
+        
+        <div class="modal fade" id="geoChooserModal" tabindex="-1" aria-labelledby="geoChooserModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="geoChooserModalLabel">Wähle einen Punkt auf der Karte</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="modal-body">
+                        <p class="text-muted">Klicke auf die Karte, um den Standort zu setzen oder ziehe den Marker an die gewünschte Position.</p>
+                        <div id="map" style="height: 400px; width: 100%;"></div>
+                        <div class="mt-2">
+                            <small class="text-muted" id="modal-coordinates"></small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                        <button type="button" class="btn btn-primary ok">Übernehmen</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-floating mb-3">
+        <input type="text"
+               id="event_tags"
+               name="tags"
+               value="{{ entity.getTagsAsText()|default('') }}"
+               class="form-control">
+        <label for="event_tags">Tags</label>
+        <div class="invalid-feedback">
+            Bitte gib gültige Tags an.
+        </div>
+        <small class="form-text text-muted">
+            Du kannst hier kommasepariert <a href="https://en.wikipedia.org/wiki/Tag_%28metadata%29">Tags</a> angeben.
+        </small>
+    </div>
+
+    <div class="mb-3 oos">
+        <div class="input-group" title="Origin URL (Screenreader: bitte leer lassen)">
+            <input type="text"
+                   name="origin"
+                   id="event_origin"
+                   maxlength="255"
+                   value="{{ entity.origin|default('') }}"
+                   class="form-control">
+            <span class="input-group-text"><i class="bi bi-globe"></i></span>
+            <div class="invalid-feedback">
+                Bitte gib eine gültige Origin URL an.
+            </div>
+        </div>
+        <label for="event_origin" class="form-label">Origin <span class="text-danger">*</span></label>
+    </div>
+
+    <button type="submit" class="btn btn-success">Speichern</button>
+</form>
