@@ -128,7 +128,8 @@ class Location extends BaseEntity
         return $this;
     }
 
-    public function hasAddress() {
+    public function hasAddress(): bool
+    {
         return ((strlen($this->streetaddress) > 0) && (strlen($this->city)));
     }
 

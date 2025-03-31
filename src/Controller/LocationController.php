@@ -2,14 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Event;
-use App\Repository\EventRepository;
-use App\Repository\LocationRepository;
 use App\Service\LocationService;
-use App\Service\SluggerService;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\Location;
-use League\CommonMark\CommonMarkConverter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
@@ -99,8 +92,8 @@ class LocationController extends AbstractController
     }
 
     #[Route('/',
-        methods: ['GET'],
         name: 'location_list_json',
+        methods: ['GET'],
         condition: "request.headers.get('Accept') == 'application/json'",
     )]
     public function indexAction(#[MapQueryParameter] ?String $q = null): Response

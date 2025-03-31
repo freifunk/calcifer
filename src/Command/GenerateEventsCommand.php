@@ -8,7 +8,12 @@ use App\Entity\RepeatingEventLogEntry;
 use App\Repository\EventRepository;
 use App\Repository\RepeatingEventRepository;
 use App\Service\SluggerService;
+use DateInterval;
+use DateTime;
+use DateTimeImmutable;
+use DateTimeZone;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -50,17 +55,17 @@ class GenerateEventsCommand extends Command
         $durationString = $input->getOption('duration');
 
         try {
-            $duration = \DateInterval::createFromDateString($durationString);
+            $duration = DateInterval::createFromDateString($durationString);
             if (!$duration) {
-                throw new \Exception('Invalid duration format');
+                throw new Exception('Invalid duration format');
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $io->error('Invalid duration: ' . $durationString);
             return Command::FAILURE;
         }
 
-        $now = new \DateTime();
-        $end = (new \DateTime())->add($duration);
+        $now = new DateTime();
+        $end = (new DateTime())->add($duration);
         
         $io->section('Generating events from repeating events');
         $io->progressStart($this->repeatingEventRepository->count([]));
@@ -70,16 +75,16 @@ class GenerateEventsCommand extends Command
 
         foreach ($repeatingEvents as $repeatingEvent) {
             /** @var RepeatingEvent $repeatingEvent */
-            $dateObj = $repeatingEvent->getNextdate() ?? new \DateTime();
+            $dateObj = $repeatingEvent->getNextdate() ?? new DateTime();
             
             // Sicherstellen, dass wir ein DateTime-Objekt haben
-            if ($dateObj instanceof \DateTimeImmutable) {
-                $nextDate = \DateTime::createFromImmutable($dateObj);
-            } elseif ($dateObj instanceof \DateTime) {
+            if ($dateObj instanceof DateTimeImmutable) {
+                $nextDate = DateTime::createFromImmutable($dateObj);
+            } elseif ($dateObj instanceof DateTime) {
                 $nextDate = $dateObj;
             }
             
-            $nextDate->setTimezone(new \DateTimeZone('Europe/Berlin'));
+            $nextDate->setTimezone(new DateTimeZone('Europe/Berlin'));
             
             $parser = new RelativeDateParser(
                 $repeatingEvent->getRepeatingPattern(),
@@ -90,13 +95,13 @@ class GenerateEventsCommand extends Command
             $lastEvent = null;
             
             while (($nextDate = $parser->getNext()) < $end) {
-                /** @var \DateTime $nextDate */
+                /** @var DateTime $nextDate */
                 $event = new Event();
                 $event->setLocation($repeatingEvent->getLocation());
                 $event->setStartdate($nextDate);
                 
                 if ($repeatingEvent->getDuration() > 0) {
-                    $durationInterval = new \DateInterval('PT' . $repeatingEvent->getDuration() . 'M');
+                    $durationInterval = new DateInterval('PT' . $repeatingEvent->getDuration() . 'M');
                     $endDate = clone $nextDate;
                     $endDate->add($durationInterval);
                     $event->setEnddate($endDate);

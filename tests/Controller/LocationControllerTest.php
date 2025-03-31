@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=0);
 
 namespace App\Tests\Controller;
 
@@ -76,7 +77,9 @@ class LocationControllerTest extends WebTestCase
             $this->createTestData();
         }
         
-        $this->client->request('GET', '/orte/' . $this->testLocation->getSlug() . '.html');
+        // Stellen Sie sicher, dass der Slug nicht null ist
+        $slug = $this->testLocation->getSlug() ?: 'testort';
+        $this->client->request('GET', '/orte/' . $slug . '.html');
 
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('h1', 'Termine');

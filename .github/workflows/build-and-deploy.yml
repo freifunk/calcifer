@@ -1,0 +1,43 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Code auschecken
+      - uses: actions/checkout@v4
+      
+      # PHP-Setup
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, sqlite3, zip
+          coverage: none
+          
+      # Composer-Cache für schnellere Builds
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+      
+      # Abhängigkeiten installieren
+      - name: Install Dependencies
+        run: composer install --prefer-dist --no-progress
+      
+      # Tests ausführen (nutzt SQLite wie lokal)
+      - name: Run Tests
+        run: vendor/bin/phpunit 

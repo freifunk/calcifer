@@ -3,12 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\RepeatingEvent;
-use App\Entity\Location;
-use App\Entity\RepeatingEventLogEntry;
-use App\Entity\Tag;
 use App\Service\RepeatingEventService;
 use App\Service\LocationService;
 use App\Service\TagService;
+use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -47,7 +45,7 @@ class RepeatingEventController extends AbstractController
     public function newAction(): Response
     {
         $entity = new RepeatingEvent();
-        $entity->setNextdate(new \DateTime());
+        $entity->setNextdate(new DateTime());
         $entity->setSummary('');
 
         return $this->render('repeating_event/new.html.twig', [
@@ -174,7 +172,7 @@ class RepeatingEventController extends AbstractController
         
         $nextdate = $request->get('nextdate');
         if ($nextdate) {
-            $entity->setNextdate(new \DateTime($nextdate));
+            $entity->setNextdate(new DateTime($nextdate));
         }
     }
 
@@ -200,7 +198,7 @@ class RepeatingEventController extends AbstractController
     }
 
     #[Route('/wiederholungsmuster', name: 'repeating_patterns', methods: ['GET', 'POST'])]
-    public function repeatingPatternsHelpAction(Request $request): Response
+    public function repeatingPatternsHelpAction(): Response
     {
         return $this->render('repeating_event/repeating_patterns.html.twig');
     }

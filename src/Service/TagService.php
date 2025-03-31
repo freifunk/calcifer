@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Tag;
 use App\Repository\TagRepository;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 
@@ -99,7 +100,7 @@ class TagService
             return [];
         }
         
-        $now = new \DateTime();
+        $now = new DateTime();
         $now->setTime(0, 0, 0);
         
         $sql = <<<EOF
@@ -144,7 +145,7 @@ EOF;
             return [];
         }
         
-        $now = new \DateTime();
+        $now = new DateTime();
         $now->setTime(0, 0, 0);
         
         $qb = $this->entityManager->createQueryBuilder();

@@ -4,6 +4,7 @@ namespace App\Tests\Entity;
 
 use App\Entity\Event;
 use App\Entity\Location;
+use DateTime;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class EventTest extends KernelTestCase
@@ -31,7 +32,7 @@ class EventTest extends KernelTestCase
     public function testGetSetStartdate(): void
     {
         $event = new Event();
-        $date = new \DateTime();
+        $date = new DateTime();
         
         $event->setStartdate($date);
         $this->assertEquals($date, $event->getStartdate());
@@ -54,19 +55,19 @@ class EventTest extends KernelTestCase
     public function testGetFormattedDate(): void
     {
         $event = new Event();
-        $startDate = new \DateTime('2023-10-01 15:00');
+        $startDate = new DateTime('2023-10-01 15:00');
         $event->setStartdate($startDate);
         
         // Test nur mit Startdatum
         $this->assertStringContainsString('2023-10-01 15:00', $event->getFormatedDate());
         
         // Test mit Start- und Enddatum am selben Tag
-        $endDate = new \DateTime('2023-10-01 16:30');
+        $endDate = new DateTime('2023-10-01 16:30');
         $event->setEnddate($endDate);
         $this->assertStringContainsString('15:00 — 16:30', $event->getFormatedDate());
         
         // Test mit Start- und Enddatum an verschiedenen Tagen
-        $endDate = new \DateTime('2023-10-02 16:30');
+        $endDate = new DateTime('2023-10-02 16:30');
         $event->setEnddate($endDate);
         $this->assertStringContainsString('2023-10-01 15:00 — 2023-10-02 16:30', $event->getFormatedDate());
     }
@@ -81,13 +82,13 @@ class EventTest extends KernelTestCase
         
         // Gültiges Event
         $event->setSummary('Test Event');
-        $event->setStartdate(new \DateTime());
+        $event->setStartdate(new DateTime());
         $errors = $event->isValid();
         $this->assertEmpty($errors);
         
         // Ungültiges Event (Enddatum vor Startdatum)
-        $event->setStartdate(new \DateTime('2023-10-10'));
-        $event->setEnddate(new \DateTime('2023-10-09'));
+        $event->setStartdate(new DateTime('2023-10-10'));
+        $event->setEnddate(new DateTime('2023-10-09'));
         $errors = $event->isValid();
         $this->assertArrayHasKey('enddate', $errors);
     }

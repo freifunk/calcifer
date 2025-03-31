@@ -3,9 +3,6 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
-use Symfony\Component\Security\Core\Exception\RuntimeException;
 
 /**
  * A base class for all other entities
@@ -21,16 +18,28 @@ abstract class BaseEntity
     #[ORM\Column(length: 255)]
     protected string $slug = '';
 
-    public function getId(): int
+    /**
+     * Returns the entity ID or null if not persisted yet
+     */
+    public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * Returns the entity slug
+     */
     public function getSlug(): string
     {
         return $this->slug;
     }
 
+    /**
+     * Sets the entity slug
+     * 
+     * @param string $slug The slug to set
+     * @return self For method chaining
+     */
     public function setSlug(string $slug): self
     {
         $this->slug = $slug;

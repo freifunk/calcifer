@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Table(name: "repeating_events_log_entries")]
@@ -23,10 +24,10 @@ class RepeatingEventLogEntry extends BaseEntity
     protected Event $event;
 
     #[ORM\Column(name: "event_startdate", type: "datetimetz")]
-    protected \DateTimeInterface $eventStartdate;
+    protected DateTimeInterface $eventStartdate;
 
     #[ORM\Column(name: "event_enddate", type: "datetimetz", nullable: true)]
-    protected ?\DateTimeInterface $eventEnddate = null;
+    protected ?DateTimeInterface $eventEnddate = null;
 
     public function getRepeatingEventsId(): int
     {
@@ -72,23 +73,23 @@ class RepeatingEventLogEntry extends BaseEntity
         return $this;
     }
 
-    public function getEventStartdate(): \DateTimeInterface
+    public function getEventStartdate(): DateTimeInterface
     {
         return $this->eventStartdate;
     }
 
-    public function setEventStartdate(\DateTimeInterface $eventStartdate): self
+    public function setEventStartdate(DateTimeInterface $eventStartdate): self
     {
         $this->eventStartdate = $eventStartdate;
         return $this;
     }
 
-    public function getEventEnddate(): ?\DateTimeInterface
+    public function getEventEnddate(): ?DateTimeInterface
     {
         return $this->eventEnddate;
     }
 
-    public function setEventEnddate(?\DateTimeInterface $eventEnddate): self
+    public function setEventEnddate(?DateTimeInterface $eventEnddate): self
     {
         $this->eventEnddate = $eventEnddate;
         return $this;

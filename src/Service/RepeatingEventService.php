@@ -7,7 +7,6 @@ use App\Entity\RepeatingEventLogEntry;
 use App\Repository\RepeatingEventLogRepository;
 use App\Repository\RepeatingEventRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use DateTime;
 
 class RepeatingEventService
 {

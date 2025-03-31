@@ -1,12 +1,14 @@
 <?php
+declare(strict_types=0);
 
 namespace App\Tests\Controller;
 
 use App\Entity\Event;
-use App\Entity\Location;
 use App\Entity\Tag;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -42,7 +44,7 @@ class EventControllerTest extends WebTestCase
             // Erstelle Testdaten nur, wenn die Tabellen existieren
             $this->createTestData();
             
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             echo "Error checking database schema: " . $e->getMessage() . "\n";
             
             // Schema neu erstellen
@@ -76,7 +78,7 @@ class EventControllerTest extends WebTestCase
             // Erstelle Testevent
             $event = new Event();
             $event->setSummary('Testevent');
-            $event->setStartdate(new \DateTime());
+            $event->setStartdate(new DateTime());
             $event->setSlug('testevent');
             $this->entityManager->persist($event);
         }
@@ -108,7 +110,9 @@ class EventControllerTest extends WebTestCase
             'startdate' => '2023-10-01T18:00',
             'description' => 'Dies ist ein Testevent',
             'location' => 'Testort',
-            'tags' => 'test,symfony,phpunit'
+            'tags' => 'test,symfony,phpunit',
+            'enddate' => '',
+            'url' => ''
         ]);
 
         $this->client->submit($form);
@@ -121,10 +125,14 @@ class EventControllerTest extends WebTestCase
     {
         $crawler = $this->client->request('GET', '/termine/neu');
 
-        // Absenden ohne required field 'summary'
+        // Absenden ohne required field 'summary', aber mit leeren Strings für optionale Felder
         $form = $crawler->selectButton('Speichern')->form([
+            'summary' => '',
             'startdate' => '2023-10-01T18:00',
-            'description' => 'Dies ist ein Testevent',
+            'description' => '',
+            'tags' => '',
+            'url' => '',
+            'location' => ''
         ]);
 
         $this->client->submit($form);

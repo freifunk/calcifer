@@ -3,14 +3,15 @@
 namespace App\Tests\Repository;
 
 use App\Entity\Event;
-use App\Entity\Location;
-use App\Repository\EventRepository;
+use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class EventRepositoryTest extends KernelTestCase
 {
-    private $entityManager;
-    private $repository;
+    private EntityManagerInterface|null $entityManager;
+    private EntityRepository|null $repository;
 
     protected function setUp(): void
     {
@@ -45,14 +46,14 @@ class EventRepositoryTest extends KernelTestCase
         // Erstelle Testdaten
         $event1 = new Event();
         $event1->setSummary('Test Event 1');
-        $event1->setStartdate(new \DateTime('tomorrow 10:00'));
-        $event1->setEnddate(new \DateTime('tomorrow 12:00'));
+        $event1->setStartdate(new DateTime('tomorrow 10:00'));
+        $event1->setEnddate(new DateTime('tomorrow 12:00'));
         $event1->setDescription('Test Description 1');
         $event1->setSlug('test-event-1');
         
         $event2 = new Event();
         $event2->setSummary('Test Event 2');
-        $event2->setStartdate(new \DateTime('next week'));
+        $event2->setStartdate(new DateTime('next week'));
         $event2->setDescription('Test Description 2');
         $event2->setSlug('test-event-2');
         
@@ -76,7 +77,7 @@ class EventRepositoryTest extends KernelTestCase
         $this->assertGreaterThanOrEqual(2, count($allEvents));
         
         // Teste das Abrufen von Events für einen bestimmten Zeitraum
-        $tomorrow = new \DateTime('tomorrow');
+        $tomorrow = new DateTime('tomorrow');
         $tomorrowStart = clone $tomorrow;
         $tomorrowStart->setTime(0, 0, 0);
         $tomorrowEnd = clone $tomorrow;
@@ -105,18 +106,18 @@ class EventRepositoryTest extends KernelTestCase
      */
     public function testFindFutureEvents(): void
     {
-        $now = new \DateTime();
+        $now = new DateTime();
         
         // Erstelle ein Event in der Vergangenheit
         $pastEvent = new Event();
         $pastEvent->setSummary('Test Event 1');
-        $pastEvent->setStartdate(new \DateTime('-1 day'));
+        $pastEvent->setStartdate(new DateTime('-1 day'));
         $pastEvent->setSlug('past-test-event');
         
         // Erstelle ein Event in der Zukunft
         $futureEvent = new Event();
         $futureEvent->setSummary('Test Event 2');
-        $futureEvent->setStartdate(new \DateTime('+1 day'));
+        $futureEvent->setStartdate(new DateTime('+1 day'));
         $futureEvent->setSlug('future-test-event');
         
         // Speichere die Events
@@ -155,5 +156,6 @@ class EventRepositoryTest extends KernelTestCase
         // Datenbank zurücksetzen
         $this->entityManager->close();
         $this->entityManager = null;
+        $this->repository = null;
     }
 } 

@@ -2,11 +2,15 @@
 
 namespace App\Entity;
 
+use DateTime;
+use DateTimeZone;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use enko\RelativeDateParser\RelativeDateParser;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
+use Exception;
+
 #[ORM\Table(name: "repeating_events")]
 #[ORM\Entity]
 class RepeatingEvent extends BaseEntity
@@ -149,13 +153,13 @@ class RepeatingEvent extends BaseEntity
             $errors['repeating_pattern'] = "Bitte gebe ein gültiges Wiederholungsmuster an.";
         } else {
             $nextdate = $this->getNextdate();
-            if ($nextdate instanceof \DateTime) {
-                $nextdate->setTimezone(new \DateTimeZone('Europe/Berlin'));
+            if ($nextdate instanceof DateTime) {
+                $nextdate->setTimezone(new DateTimeZone('Europe/Berlin'));
                 $this->setNextdate($nextdate);
             }
             try {
                 $parser = new RelativeDateParser($this->getRepeatingPattern(), $this->getNextdate(), 'de');
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $errors['repeating_pattern'] = "Bitte gebe ein gültiges Wiederholungsmuster an.";
             }
         }

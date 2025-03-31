@@ -3,7 +3,6 @@
 namespace App\Tests\Repository;
 
 use App\Entity\Tag;
-use App\Repository\TagRepository;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class TagRepositoryTest extends KernelTestCase

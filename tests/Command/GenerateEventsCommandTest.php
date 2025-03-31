@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=0);
 
 namespace App\Tests\Command;
 
@@ -7,13 +8,12 @@ use App\Entity\Event;
 use App\Entity\RepeatingEvent;
 use App\Entity\Location;
 use App\Entity\RepeatingEventLogEntry;
-use App\Entity\Tag;
 use App\Repository\EventRepository;
 use App\Repository\RepeatingEventRepository;
 use App\Service\SluggerService;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class GenerateEventsCommandTest extends KernelTestCase
@@ -21,7 +21,6 @@ class GenerateEventsCommandTest extends KernelTestCase
     private EntityManagerInterface $entityManager;
     private RepeatingEventRepository $repeatingEventRepository;
     private EventRepository $eventRepository;
-    private SluggerService $sluggerService;
     private GenerateEventsCommand $command;
 
     protected function setUp(): void
@@ -32,13 +31,13 @@ class GenerateEventsCommandTest extends KernelTestCase
         $this->entityManager = $container->get('doctrine.orm.entity_manager');
         $this->repeatingEventRepository = $container->get(RepeatingEventRepository::class);
         $this->eventRepository = $container->get(EventRepository::class);
-        $this->sluggerService = $container->get(SluggerService::class);
+        $sluggerService = $container->get(SluggerService::class);
 
         $this->command = new GenerateEventsCommand(
             $this->entityManager,
             $this->repeatingEventRepository,
             $this->eventRepository,
-            $this->sluggerService
+            $sluggerService
         );
         
         // Stelle sicher, dass der Test mit einer leeren DB startet
@@ -97,7 +96,7 @@ class GenerateEventsCommandTest extends KernelTestCase
         }
 
         // Aktuelles Datum für das Test-Event
-        $startDate = new \DateTime('today');
+        $startDate = new DateTime('today');
 
         // Erstelle ein wiederkehrendes Event mit einem 14-tägigen Muster
         $repeatingEvent = new RepeatingEvent();
@@ -166,7 +165,7 @@ class GenerateEventsCommandTest extends KernelTestCase
         $event = new Event();
         $event->setSummary('Test Event');
         $event->setDescription('Manually created test event');
-        $event->setStartdate(new \DateTime());
+        $event->setStartdate(new DateTime());
         $event->setLocation($location);
         $event->setSlug('manual-test-event');
         
@@ -185,8 +184,6 @@ class GenerateEventsCommandTest extends KernelTestCase
         $this->clearEvents();
         
         // Vermeiden von Memory-Leaks
-        if ($this->entityManager) {
-            $this->entityManager->close();
-        }
+        $this->entityManager->close();
     }
 } 

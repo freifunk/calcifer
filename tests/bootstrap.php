@@ -3,6 +3,7 @@
 use App\Entity\Location;
 use App\Entity\Tag;
 use App\Kernel;
+use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Component\Dotenv\Dotenv;
 
 require dirname(__DIR__).'/vendor/autoload.php';
@@ -36,7 +37,7 @@ if (!is_dir(dirname($dbPath))) {
 $metadatas = $entityManager->getMetadataFactory()->getAllMetadata();
 if (!empty($metadatas)) {
     // Create schema
-    $schemaTool = new \Doctrine\ORM\Tools\SchemaTool($entityManager);
+    $schemaTool = new SchemaTool($entityManager);
     $schemaTool->createSchema($metadatas);
     echo "Test database schema created successfully\n";
     
@@ -77,7 +78,7 @@ if (!empty($metadatas)) {
         $entityManager->flush();
         $entityManager->commit();
         echo "Test data added successfully\n";
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         $entityManager->rollback();
         echo "Failed to add test data: " . $e->getMessage() . "\n";
     }

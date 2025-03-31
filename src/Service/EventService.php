@@ -9,6 +9,9 @@ use App\Repository\TagRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
+/**
+ * Service for managing Event entities
+ */
 class EventService
 {
     public function __construct(
@@ -21,7 +24,7 @@ class EventService
     /**
      * Finds all upcoming events from today
      * 
-     * @return Event[]
+     * @return array<int, Event> List of upcoming events sorted by start date
      */
     public function findUpcomingEvents(): array
     {
@@ -38,6 +41,9 @@ class EventService
 
     /**
      * Finds an event by its slug
+     * 
+     * @param string $slug The slug to search for
+     * @return Event|null The event if found, null otherwise
      */
     public function findBySlug(string $slug): ?Event
     {
@@ -46,6 +52,9 @@ class EventService
 
     /**
      * Saves an event entity
+     * 
+     * @param Event $event The event to save
+     * @param bool $flush Whether to flush changes immediately
      */
     public function save(Event $event, bool $flush = true): void
     {
@@ -58,6 +67,9 @@ class EventService
 
     /**
      * Deletes an event entity
+     * 
+     * @param Event $event The event to delete
+     * @param bool $flush Whether to flush changes immediately
      */
     public function delete(Event $event, bool $flush = true): void
     {
@@ -69,7 +81,11 @@ class EventService
     }
 
     /**
-     * Process tags for an event
+     * Process tags for an event by creating missing tags and associating 
+     * them with the event
+     * 
+     * @param Event $event The event to process tags for
+     * @param string $tagString Comma-separated list of tags
      */
     public function processTags(Event $event, string $tagString): void
     {
@@ -78,6 +94,7 @@ class EventService
             $event->clearTags();
             foreach ($tags as $tag) {
                 $tag = trim($tag);
+                /** @var array<int, Tag> $results */
                 $results = $this->tagRepository->findBy(['name' => $tag]);
                 if (count($results) > 0) {
                     $event->addTag($results[0]);
@@ -95,6 +112,9 @@ class EventService
 
     /**
      * Generate a unique slug for an event
+     * 
+     * @param string $title The title to generate a slug from
+     * @return string The generated unique slug
      */
     public function generateSlug(string $title): string
     {

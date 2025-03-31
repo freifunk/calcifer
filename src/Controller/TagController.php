@@ -3,14 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Tag;
-use App\Repository\TagRepository;
 use App\Service\TagService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
-use Doctrine\ORM\Query\ResultSetMappingBuilder;
 
 use Sabre\VObject;
 

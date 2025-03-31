@@ -7,21 +7,19 @@ use App\Entity\Location;
 use App\Entity\Tag;
 use App\Service\EventService;
 use App\Service\LocationService;
-use App\Service\SluggerService;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Sabre\VObject;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Validator\Constraints\Collection;
 
 #[Route("/")]
 class EventController extends AbstractController
 {
     public function __construct(
-        private readonly SluggerService         $sluggerService,
         private readonly LocationService        $locationService,
         private readonly EventService           $eventService
     )
@@ -47,7 +45,7 @@ class EventController extends AbstractController
 
 
     #[Route('/', name: "_index", methods: ['GET'])]
-    public function indexAction()
+    public function indexAction(): Response
     {
         $entities = $this->eventService->findUpcomingEvents();
 
@@ -209,7 +207,7 @@ class EventController extends AbstractController
     }
 
     #[Route("/termine/{slug}/löschen", name: "_delete", methods: ["GET", "POST"])]
-    public function deleteAction(Request $request, $slug)
+    public function deleteAction(Request $request, $slug): RedirectResponse|Response
     {
         $entity = $this->eventService->findBySlug($slug);
 
@@ -234,7 +232,7 @@ class EventController extends AbstractController
     }
 
     #[Route("/termine/{slug}/kopieren", name: "_copy", methods: ["GET"])]
-    public function copyAction(Request $request, string $slug): Response
+    public function copyAction(string $slug): Response
     {
         $originalEvent = $this->eventService->findBySlug($slug);
 

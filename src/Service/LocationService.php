@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Event;
 use App\Entity\Location;
 use App\Repository\LocationRepository;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use League\CommonMark\CommonMarkConverter;
 
@@ -31,7 +32,7 @@ class LocationService
      */
     public function findUpcomingEventsForLocation(Location $location): array
     {
-        $now = new \DateTime();
+        $now = new DateTime();
         $now->setTime(0, 0, 0);
 
         $qb = $this->entityManager->createQueryBuilder();

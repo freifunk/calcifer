@@ -4,15 +4,13 @@ namespace App\Tests\Integration;
 
 use App\Entity\Event;
 use App\Entity\Tag;
-use App\Repository\EventRepository;
-use App\Repository\TagRepository;
+use DateTime;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class EventIntegrationTest extends KernelTestCase
 {
     private $entityManager;
     private $eventRepository;
-    private $tagRepository;
 
     protected function setUp(): void
     {
@@ -22,7 +20,6 @@ class EventIntegrationTest extends KernelTestCase
             ->getManager();
         
         $this->eventRepository = $this->entityManager->getRepository(Event::class);
-        $this->tagRepository = $this->entityManager->getRepository(Tag::class);
     }
 
     public function testCreateEventWithTags(): void
@@ -38,7 +35,7 @@ class EventIntegrationTest extends KernelTestCase
         // Erstelle ein neues Event mit diesem Tag
         $event = new Event();
         $event->setSummary('Test Event');
-        $event->setStartdate(new \DateTime());
+        $event->setStartdate(new DateTime());
         $event->setSlug('test-event');
         $event->addTag($tag);
         
@@ -60,7 +57,7 @@ class EventIntegrationTest extends KernelTestCase
         // Erstelle ein Event mit mehreren Tags
         $event = new Event();
         $event->setSummary('Multiple Tags Event');
-        $event->setStartdate(new \DateTime());
+        $event->setStartdate(new DateTime());
         $event->setSlug('multiple-tags-event');
         
         $tag1 = new Tag();

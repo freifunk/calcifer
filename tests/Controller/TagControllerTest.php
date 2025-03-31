@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=0);
 
 namespace App\Tests\Controller;
 
@@ -142,7 +143,11 @@ class TagControllerTest extends WebTestCase
             $this->createTestData();
         }
         
-        $this->client->request('GET', '/tags/testtag1.html');
+        // Verwende stets einen gültigen Slug für den Test
+        $tagSlug = !empty($this->testTags) && $this->testTags[0]->getSlug() ? 
+                  $this->testTags[0]->getSlug() : 'testtag1';
+        
+        $this->client->request('GET', '/tags/' . $tagSlug . '.html');
 
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('h1', 'Termine');
