@@ -168,15 +168,17 @@ class LocationControllerTest extends WebTestCase
      */
     public function testUpdateActionWithValidData(): void
     {
-        $locationId = $this->testLocation->getId();
         $locationSlug = $this->testLocation->getSlug();
+        
+        // Den Namen aktualisieren - wir erstellen einen eindeutigen Namen
+        $newName = 'UpdatedLocationName_' . uniqid();
         
         // Direkt eine POST-Anfrage an die Update-URL senden
         $this->client->request(
             'POST',
             '/orte/' . $locationSlug . '/bearbeiten',
             [
-                'name' => 'UpdatedLocationName',
+                'name' => $newName,
                 'streetaddress' => 'Neue Teststraße',
                 'streetnumber' => '456',
                 'zipcode' => '54321',
@@ -189,15 +191,32 @@ class LocationControllerTest extends WebTestCase
         // Nach erfolgreicher Aktualisierung sollte eine Weiterleitung erfolgen
         $this->assertTrue($this->client->getResponse()->isRedirect(), 'Es erfolgte keine Weiterleitung nach dem Update');
         
-        // Überprüfe in der Datenbank, ob die Änderungen gespeichert wurden
-        $this->entityManager->clear(); // Cache leeren
-        $updatedLocation = $this->entityManager->getRepository(Location::class)
-            ->find($locationId);
+        // Holen Sie den neuen Slug aus der Weiterleitungs-URL
+        $redirect = $this->client->getResponse()->headers->get('Location');
+        $matches = [];
+        preg_match('/\/orte\/([^.]+)/', $redirect, $matches);
+        $newSlug = $matches[1] ?? '';
         
-        $this->assertNotNull($updatedLocation, 'Der Ort wurde nicht gefunden');
-        $this->assertEquals('UpdatedLocationName', $updatedLocation->getName());
-        $this->assertEquals('Neue Teststraße', $updatedLocation->getStreetAddress());
-        $this->assertEquals('54321', $updatedLocation->getZipCode());
+        // Direkte Anfrage an die neue URL mit dem neuen Slug
+        $this->client->request('GET', '/orte/' . $newSlug . '.html');
+        
+        // Überprüfen, ob der Inhalt der Seite die aktualisierten Daten enthält
+        $content = $this->client->getResponse()->getContent();
+        $this->assertStringContainsString($newName, $content);
+        
+        // Neustart des Entity Managers - manchmal hilft das bei Problemen mit der Test-DB
+        $container = $this->client->getContainer();
+        $this->entityManager->close();
+        $this->entityManager = $container->get('doctrine')->getManager();
+        
+        // Direkter Datenbankzugriff für sicherere Überprüfung
+        $updatedLocation = $this->entityManager->getRepository(Location::class)
+            ->findOneBy(['name' => $newName]);
+        
+        $this->assertNotNull($updatedLocation, 'Der aktualisierte Ort wurde nicht gefunden');
+        $this->assertEquals($newName, $updatedLocation->getName(), 'Der Name wurde nicht korrekt aktualisiert');
+        $this->assertEquals('Neue Teststraße', $updatedLocation->getStreetAddress(), 'Die Straße wurde nicht korrekt aktualisiert');
+        $this->assertEquals('54321', $updatedLocation->getZipCode(), 'Die PLZ wurde nicht korrekt aktualisiert');
     }
     
     /**

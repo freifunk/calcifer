@@ -146,6 +146,7 @@ class TagControllerTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('h1', 'Termine');
+        $this->assertSelectorTextContains('h1', 'TestTag1');
     }
     
     /**
@@ -157,6 +158,53 @@ class TagControllerTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('h1', 'Termine');
+        $this->assertSelectorTextContains('h1', 'TestTag1');
+        $this->assertSelectorTextContains('h1', 'TestTag2');
+        $this->assertSelectorTextContains('h1', 'oder');
+    }
+    
+    /**
+     * Test für showAction mit mehreren Tags (AND-Verknüpfung)
+     */
+    public function testShowActionMultipleTagsAnd(): void
+    {
+        $this->client->request('GET', '/tags/testtag1&testtag2.html');
+
+        $this->assertResponseIsSuccessful();
+        
+        // Überprüfe, ob beide Tagnamen und das "und" (AND-Verknüpfung) in der Überschrift vorkommen
+        $this->assertSelectorTextContains('h1', 'Termine');
+        $this->assertSelectorTextContains('h1', 'TestTag1');
+        $this->assertSelectorTextContains('h1', 'TestTag2');
+        $this->assertSelectorTextContains('h1', 'und');
+    }
+    
+    /**
+     * Test für showAction mit ICS-Format
+     */
+    public function testShowActionIcsFormat(): void
+    {
+        $this->client->request('GET', '/tags/testtag1.ics');
+
+        $this->assertResponseIsSuccessful();
+        
+        $response = $this->client->getResponse();
+        // Überprüfe den Content-Type
+        $contentType = $response->headers->get('Content-Type');
+        $this->assertStringContainsString(
+            'text/calendar', 
+            $contentType,
+            'Response sollte Content-Type text/calendar enthalten'
+        );
+        
+        // Überprüfe, ob typische iCalendar-Elemente im Inhalt vorhanden sind
+        $content = $response->getContent();
+        $this->assertStringContainsString('BEGIN:VCALENDAR', $content);
+        $this->assertStringContainsString('VERSION:', $content);
+        $this->assertStringContainsString('BEGIN:VEVENT', $content);
+        $this->assertStringContainsString('SUMMARY:', $content);
+        $this->assertStringContainsString('END:VEVENT', $content);
+        $this->assertStringContainsString('END:VCALENDAR', $content);
     }
     
     /**
@@ -170,9 +218,8 @@ class TagControllerTest extends WebTestCase
     }
     
     /**
-     * Hinweis: Die AND-Verknüpfung und ICS-Tests wurden entfernt, da sie in SQLite
-     * nicht korrekt funktionieren. In einer Produktionsumgebung mit PostgreSQL würden
-     * diese Tests funktionieren, aber im Testumfeld mit SQLite nicht.
+     * Die AND-Verknüpfung und ICS-Tests funktionieren nun aufgrund der geänderten 
+     * SQL-Abfrage auf allen Datenbanken, nicht nur auf PostgreSQL.
      */
     
     protected function tearDown(): void

@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Event;
 use App\Repository\EventRepository;
 use App\Repository\LocationRepository;
+use App\Service\LocationService;
 use App\Service\SluggerService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Location;
@@ -21,31 +22,19 @@ class LocationController extends AbstractController
 {
 
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        private readonly LocationRepository     $locationRepository,
-        private readonly SluggerService        $sluggerService
+        private readonly LocationService $locationService
     ){}
+    
     #[Route('/{slug}.{format}', name: 'location_show', defaults: ['format' => 'html'], methods: ['GET'])]
     public function showAction(string $slug, string $format): Response
     {
-        $location = $this->locationRepository->findOneBy(['slug' => $slug]);
+        $location = $this->locationService->findBySlug($slug);
 
         if (!$location) {
             throw $this->createNotFoundException('Unable to find Location entity.');
         }
 
-        $now = new \DateTime();
-        $now->setTime(0, 0, 0);
-
-        $qb = $this->entityManager->createQueryBuilder();
-        $qb->select('e')
-            ->from(Event::class, 'e')
-            ->where('e.startdate >= :startdate')
-            ->andWhere('e.locations_id = :location')
-            ->orderBy('e.startdate')
-            ->setParameter('startdate', $now)
-            ->setParameter('location', $location->getId());
-        $entities = $qb->getQuery()->execute();
+        $entities = $this->locationService->findUpcomingEventsForLocation($location);
 
         if ($format === 'ics') {
             $vcalendar = new VObject\Component\VCalendar();
@@ -69,7 +58,7 @@ class LocationController extends AbstractController
     #[Route('/{slug}/bearbeiten', name: 'location_edit', methods: ['GET'])]
     public function editAction(string $slug): Response
     {
-        $location = $this->locationRepository->findOneBy(['slug' => $slug]);
+        $location = $this->locationService->findBySlug($slug);
 
         if (!$location) {
             throw $this->createNotFoundException('Unable to find Location entity.');
@@ -83,38 +72,30 @@ class LocationController extends AbstractController
     #[Route('/{slug}/bearbeiten', name: 'location_update', methods: ['POST'])]
     public function updateAction(Request $request, string $slug): Response
     {
-        $location = $this->locationRepository->findOneBy(['slug' => $slug]);
+        $location = $this->locationService->findBySlug($slug);
 
         if (!$location) {
             throw $this->createNotFoundException('Unable to find Location entity.');
         }
 
-        if ($location->getName() !== $request->get('name')) {
-            $newLocation = $this->locationRepository->findOneBy(['name' => $request->get('name')]);
-            if (is_null($newLocation)) {
-                $location->setName($request->get('name'));
-                $location->setSlug($this->sluggerService->generateUniqueSlug($location->getName(), $this->locationRepository));
-            } else {
-                $this->addFlash('error', 'Ort mit diesem Namen existiert bereits.');
-                return $this->redirectToRoute('location_edit', ['slug' => $location->getSlug()]);
-            }
-        }
-        $location->setStreetAddress($request->get('streetaddress'));
-        $location->setStreetNumber($request->get('streetnumber'));
-        $location->setZipCode($request->get('zipcode'));
-        $location->setCity($request->get('city'));
-        $location->setDescription($request->get('description'));
+        $data = [
+            'name' => $request->get('name'),
+            'streetaddress' => $request->get('streetaddress'),
+            'streetnumber' => $request->get('streetnumber'),
+            'zipcode' => $request->get('zipcode'),
+            'city' => $request->get('city'),
+            'description' => $request->get('description'),
+            'geocords' => $request->get('geocords')
+        ];
 
-        $latlon = explode(',', $request->get('geocords'));
-        if (count($latlon) === 2) {
-            $location->setLat($latlon[0]);
-            $location->setLon($latlon[1]);
+        $result = $this->locationService->updateLocation($location, $data);
+        
+        if (!$result['success']) {
+            $this->addFlash('error', $result['message']);
+            return $this->redirectToRoute('location_edit', ['slug' => $location->getSlug()]);
         }
 
-        $this->entityManager->persist($location);
-        $this->entityManager->flush();
-
-        return $this->redirectToRoute('location_show', ['slug' => $location->getSlug()]);
+        return $this->redirectToRoute('location_show', ['slug' => $result['location']->getSlug()]);
     }
 
     #[Route('/',
@@ -122,39 +103,18 @@ class LocationController extends AbstractController
         name: 'location_list_json',
         condition: "request.headers.get('Accept') == 'application/json'",
     )]
-    public function indexAction(#[MapQueryParameter] ?String $q): Response
+    public function indexAction(#[MapQueryParameter] ?String $q = null): Response
     {
-            $qb = $this->entityManager->createQueryBuilder();
-            $qb->select('l')
-                ->from(Location::class, 'l')
-                ->where('LOWER(l.name) LIKE LOWER(:location)')
-                ->orderBy('l.name')
-                ->setParameter('location', sprintf('%%%s%%', $q));
+        $locations = $this->locationService->findLocationsLike($q);
+        $locationsArray = $this->locationService->convertLocationsToArray($locations);
 
-            $entities = $qb->getQuery()->execute();
+        $response = new Response(json_encode([
+            'success' => true,
+            'results' => $locationsArray,
+        ]));
+        $response->headers->set('Content-Type', 'application/json');
 
-            $locations = array_map(function (Location $location) {
-                $mdConverter = new CommonMarkConverter();
-                return [
-                    'id' => $location->getId(),
-                    'name' => $location->getName(),
-                    'description' => $location->getDescription() != null ? $mdConverter->convert($location->getDescription()): '',
-                    'streetaddress' => $location->getStreetAddress(),
-                    'streetnumber' => $location->getStreetNumber(),
-                    'zipcode' => $location->getZipCode(),
-                    'city' => $location->getCity(),
-                    'lon' => $location->getLon(),
-                    'lat' => $location->getLat(),
-                ];
-            }, $entities);
-
-            $response = new Response(json_encode([
-                'success' => true,
-                'results' => $locations,
-            ]));
-            $response->headers->set('Content-Type', 'application/json');
-
-            return $response;
+        return $response;
     }
 
     #[Route('/', methods: ['GET'])]

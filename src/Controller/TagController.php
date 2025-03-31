@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Tag;
 use App\Repository\TagRepository;
+use App\Service\TagService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,101 +19,24 @@ class TagController extends AbstractController
 {
 
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        private readonly TagRepository $tagRepository
+        private readonly TagService $tagService
     ) {}
     
     #[Route('/{slug}.{format}', name: 'tag_show', defaults: ['format' => 'html'], methods: ['GET'])]
     public function showAction(string $slug, string $format): Response
     {
-        $tags = [];
-        $operator = 'or';
-        if (str_contains($slug, '|')) {
-            $slugs = explode('|', $slug);
-            foreach ($slugs as $item) {
-                $tag = $this->tagRepository->findOneBy(['slug' => $item]);
-
-                if ($tag instanceof Tag) {
-                    $tags[] = $tag;
-                }
-            }
-        } else if (str_contains($slug, '&')) {
-            $slugs = explode('&', $slug);
-            $operator = 'and';
-            foreach ($slugs as $item) {
-                $tag = $this->tagRepository->findOneBy(['slug' => $item]);
-
-                if ($tag instanceof Tag) {
-                    $tags[] = $tag;
-                }
-            }
-        } else {
-            $tag = $this->tagRepository->findOneBy(['slug' => $slug]);
-
-            if ($tag instanceof Tag) {
-                $tags[] = $tag;
-            }
-        }
+        $result = $this->tagService->findTagsBySlugString($slug);
+        $tags = $result['tags'];
+        $operator = $result['operator'];
 
         if (count($tags) == 0) {
             throw $this->createNotFoundException('Unable to find tag entity.');
         }
 
-        $now = new \DateTime();
-        $now->setTime(0, 0, 0);
-
-        $entities = null;
-        if ($operator == 'and') {
-            $sql = <<<EOF
-SELECT * FROM events AS e
-WHERE id IN (
-WITH events_on_tags AS (
-  SELECT events_id, array_agg(tags_id) as tags
-  FROM events2tags
-  GROUP BY events_id
-)
-SELECT events_id FROM events_on_tags
-WHERE tags @> array[@tags@]
-)
-AND e.startdate >= :startdate
-ORDER BY e.startdate
-EOF;
-            $tag_ids = array_reduce($tags, function ($carry, $item) {
-                if (strlen($carry) == 0) {
-                    return $item->getId();
-                } else {
-                    return $carry . ',' . $item->getId();
-                }
-            });
-
-            $sql = str_replace('@tags@', $tag_ids, $sql);
-
-            $rsm = new ResultSetMappingBuilder($this->entityManager);
-            $rsm->addRootEntityFromClassMetadata('App\Entity\Event', 'e');
-
-            $query = $this->entityManager->createNativeQuery($sql, $rsm);
-
-            $query->setParameter('startdate', $now);
-
-            $entities = $query->getResult();
-
-        } else {
-            $qb = $this->entityManager->createQueryBuilder();
-            $qb->select(array('e'))
-                ->from('App\Entity\Event', 'e')
-                ->where('e.startdate >= :startdate')
-                ->orderBy('e.startdate')
-                ->setParameter('startdate', $now);
-
-            $qb->join('e.tags', 't', 'WITH', $qb->expr()->in('t.id', array_reduce($tags, function ($carry, $item) {
-                if (strlen($carry) == 0) {
-                    return $item->getId();
-                } else {
-                    return $carry . ',' . $item->getId();
-                }
-            })));
-            $entities = $qb->getQuery()->execute();
-        }
+        // Lade die entsprechenden Events basierend auf den gefundenen Tags
+        $entities = $operator === 'and'
+            ? $this->tagService->findEventsWithTagsAND($tags)
+            : $this->tagService->findEventsWithTagsOR($tags);
 
         if ($format == 'ics') {
             $vcalendar = new VObject\Component\VCalendar();
@@ -142,17 +66,7 @@ EOF;
     )]
     public function indexAction(#[MapQueryParameter] ?string $q = ''): Response
     {
-        $qb = $this->entityManager->createQueryBuilder();
-        $qb->select(['t'])
-            ->from('App\Entity\Tag', 't');
-        
-        if (!empty($q)) {
-            $qb->where('t.name LIKE :tag')
-                ->setParameter('tag', sprintf('%%%s%%', strtolower($q)));
-        }
-        
-        $qb->orderBy('t.name');
-        $entities = $qb->getQuery()->execute();
+        $entities = $this->tagService->findTagsLike($q);
 
         $tags = [];
         foreach($entities as $tag) {
