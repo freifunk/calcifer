@@ -3,12 +3,12 @@
         <h2 class="card-title"><a href="{{ path('_show', { 'slug': entity.slug }) }}">{{ entity.summary }}</a></h2>
 
         <div class="card-subtitle mb-2 text-muted">
-            <span class="badge bg-success">
+            <span class="badge bg-primary">
                 <i class="bi bi-calendar"></i> {{ entity.getFormatedDate() }}
             </span>
 
             {% if entity.location is not null %}
-                <a class="badge bg-success" href="{{ path('location_show', {'slug' : entity.location.slug }) }}">
+                <a class="badge bg-primary" href="{{ path('location_show', {'slug' : entity.location.slug }) }}">
                     <i class="bi bi-geo-alt"></i> {{ entity.location.name }}
                 </a>
             {% endif %}
@@ -16,7 +16,7 @@
             {% if detail|default(false) %}
                 {% if entity.tags|length > 0 %}
                     {% for tag in entity.tags %}
-                        <a class="badge bg-success" href="{{ path('tag_show', {'slug' : tag.slug }) }}">
+                        <a class="badge bg-primary" href="{{ path('tag_show', {'slug' : tag.slug }) }}">
                             <i class="bi bi-tag"></i> {{ tag.name }}
                         </a>
                     {% endfor %}
@@ -24,7 +24,7 @@
             {% endif %}
 
             {% if entity.url is not null and entity.url|length > 0 %}
-                <a class="badge bg-success" href="{{ entity.url }}">
+                <a class="badge bg-primary" href="{{ entity.url }}">
                     <i class="bi bi-globe"></i> {{ entity.url|u.truncate(30) }}
                 </a>
             {% endif %}
@@ -39,7 +39,7 @@
         </div>
 
         {% if detail|default(false) %}
-            <a class="btn btn-success btn-sm" href="{{ path('_edit', {'slug' : entity.slug }) }}">
+            <a class="btn btn-primary btn-sm" href="{{ path('_edit', {'slug' : entity.slug }) }}">
                 <i class="bi bi-pencil"></i> Bearbeiten
             </a>
             <a class="btn btn-danger btn-sm" href="{{ path('_delete', {'slug' : entity.slug }) }}">

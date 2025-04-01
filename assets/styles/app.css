@@ -1,3 +1,57 @@
+:root {
+    /* Bootstrap theme Farben anpassen */
+    --bs-primary: #198754;
+    --bs-primary-rgb: 25, 135, 84;
+    
+    /* Buttons und Links auf primary umstellen */
+    --bs-btn-bg: var(--bs-primary);
+    --bs-btn-border-color: var(--bs-primary);
+    --bs-link-color: var(--bs-primary);
+    --bs-link-hover-color: #146c43;
+}
+
+/* Unsere primären Buttons immer mit primary-Farbe statt success */
+.btn-primary {
+    --bs-btn-bg: var(--bs-primary);
+    --bs-btn-border-color: var(--bs-primary);
+    --bs-btn-hover-bg: #146c43;
+    --bs-btn-hover-border-color: #146c43;
+    --bs-btn-active-bg: #146c43;
+    --bs-btn-active-border-color: #146c43;
+}
+
+/* Navbar Verbesserungen */
+.navbar {
+    padding-top: 0.7rem;
+    padding-bottom: 0.7rem;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.85);
+    border-radius: 0.25rem;
+    padding: 0.5rem 0.8rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.navbar-dark .navbar-nav .nav-link.active {
+    color: var(--bs-primary);
+    background-color: #fff;
+}
+
+.navbar-brand {
+    font-size: 1.4rem;
+    transition: transform 0.2s ease;
+}
+
+.navbar-brand:hover {
+    transform: scale(1.05);
+}
+
 body {
     font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
 }

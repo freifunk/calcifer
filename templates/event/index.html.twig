@@ -2,7 +2,7 @@
 
 {% block body -%}
     <div class="container mt-4">
-        <h1 class="display-4 text-success">
+        <h1 class="display-6 text-primary">
             Termine
             {% if tags|default(false) %}
                 {% if tags|length == 1 %}
@@ -20,9 +20,9 @@
                     {% endfor %}
                 {% endif %}
             {% endif %}
-            {% if location|default(false) %} für Ort „{{ location.name }}“ <a class="location-edit"
+            {% if location|default(false) %} für Ort „{{ location.name }}" <a class="location-edit"
                                                                               href="{{ path("location_edit",{slug:location.slug}) }}"><i
-                        class="ui icon edit green link" data-content="Ort bearbeiten"
+                        class="bi bi-pencil-square text-primary" data-content="Ort bearbeiten"
                         title="Ort bearbeiten"></i> </a> {% endif %}
         </h1>
         {% if tags|default and tags|length == 1 %}
@@ -31,7 +31,7 @@
         {% endif %}
         {% if location|default(false) %}
             {% if (location.description|length > 0) or location.hasAddress() %}
-                <div id="location-description" class="alert alert-success">
+                <div id="location-description" class="alert bg-light border-primary">
                     {% if (location.description|length > 0) %}
                         <p>{{ location.description|markdown_to_html }}</p>
                     {% endif %}
