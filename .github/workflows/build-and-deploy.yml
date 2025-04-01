@@ -50,7 +50,7 @@ jobs:
           coverage: none
 
       - name: Install dependencies
-        run: ./bin/composer install --no-dev --optimize-autoloader --no-scripts
+        run: composer install --no-dev --optimize-autoloader --no-scripts
 
       - name: Set up environment
         run: cp .env.prod .env
