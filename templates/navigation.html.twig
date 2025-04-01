@@ -1,0 +1,30 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold {% if app.request.pathinfo == path('_index') %}active{% endif %}" href="{{ path('_index') }}">
+            <i class="bi bi-calendar-event me-1"></i>
+            Calcifer
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item mx-1">
+                    <a class="nav-link {% if app.request.pathinfo == path('_new') %}active fw-bold{% endif %}" href="{{ path('_new') }}">
+                        <i class="bi bi-plus-circle me-1"></i> Neuer Termin
+                    </a>
+                </li>
+                <li class="nav-item mx-1">
+                    <a class="nav-link {% if app.request.pathinfo == path('repeating_event_show') %}active fw-bold{% endif %}" href="{{ path('repeating_event_show') }}">
+                        <i class="bi bi-arrow-repeat me-1"></i> Wiederholende Termine
+                    </a>
+                </li>
+                <li class="nav-item mx-1">
+                    <a class="nav-link {% if app.request.pathinfo == path('about_calcifer') %}active fw-bold{% endif %}" href="{{ path('about_calcifer') }}">
+                        <i class="bi bi-info-circle me-1"></i> Über Calcifer
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

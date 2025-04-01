@@ -1,7 +1,46 @@
-# Calcifer Terminverwaltung
+# calcifer
 
-[![Join the chat at https://gitter.im/HackspaceJena/calcifer](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/HackspaceJena/calcifer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/HackspaceJena/calcifer.svg?branch=master)](https://travis-ci.org/HackspaceJena/calcifer)
+## Requirements
 
-Calcifer ist ein Daemon aus dem Anime [Howl no Ugoku Shiro](http://anidb.net/perl-bin/animedb.pl?show=anime&aid=1218), der sich darum kümmert das sich Howls Schloss weiter bewegt. Diese Terminverwaltung soll dafür sorgen das sich der [Hackspace Jena](https://www.krautspace.de/) auch weiter bewegt und viele tolle Termine statfinden.
+- PHP 8.0 or higher
+- Composer
+- SQLite (or another database supported by Doctrine)
 
-Das [offizielle Repository](https://phablab.krautspace.de/diffusion/C/) für diese Software findet man auf der Phabrictator-Instanz des Hackspaces. Für Leute die lieber auf Github stehen wurde ein Mirror unter [https://github.com/HackspaceJena/calcifer](https://github.com/HackspaceJena/calcifer) eingerichtet.
+## Installation
+
+1. Clone the repository:
+    ```sh
+    git clone https://github.com/freifunk/calcifer.git
+    cd calcifer
+    ```
+
+2. Install PHP dependencies:
+    ```sh
+    composer install
+    ```
+
+## Initializing the Database
+
+1. Create the database schema:
+    ```sh
+    php bin/console doctrine:schema:create
+    ```
+
+## Running Tests
+
+1. Run PHPUnit tests:
+    ```sh
+    ./vendor/bin/phpunit
+    ```
+
+## Additional Commands
+
+- To clear the cache:
+    ```sh
+    php bin/console cache:clear
+    ```
+
+- To run the development server:
+    ```sh
+    php -S localhost:8000 -t public/ 
+    ```

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>{% block title %}Terminverwaltung Calcifer{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/favicon.png" />
+    {% block javascripts %}
+        {{ importmap() }}
+    {% endblock %}
+    {% block css %}{% endblock %}
+</head>
+
+<body>
+    {% include "navigation.html.twig" %}
+
+  <div id="main" class="container mt-4">
+      {% block body %}{% endblock %}
+  </div>
+</body>
+</html>

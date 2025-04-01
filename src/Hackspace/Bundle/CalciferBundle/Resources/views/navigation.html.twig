@@ -1,7 +1,0 @@
-<header class="ui green main menu">
-  <a class="title {% if app.request.pathinfo == path('') %}active {% endif %}item" href="{{ path('') }}">Start</a>
-  <a class="{% if app.request.pathinfo == path('_new') %}active {% endif %}item" href="{{ path('_new') }}">Neuer Termin</a>
-  <a class="{% if app.request.pathinfo == path('repeating_event_show') %}active {% endif %}item" href="{{ path('repeating_event_show') }}">Wiederholende Termine</a>
-  <a class="{% if app.request.pathinfo == path('about_calcifer') %}active {% endif %}item" href="{{ path('about_calcifer') }}">Über Calcifer</a>
-</header>
-

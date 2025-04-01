@@ -1,0 +1,91 @@
+{% extends 'layout.html.twig' %}
+
+{% block body -%}
+    <div class="container mt-4">
+        <h1 class="display-6 text-primary">
+            Termine
+            {% if tags|default(false) %}
+                {% if tags|length == 1 %}
+                    für Tag {{ tags[0].name }}
+                {% elseif(tags|length == 2) %}
+                    für die Tags {{ tags[0].name }} {% if operator == 'or' %}oder{% else %}und{% endif %} {{ tags[1].name }}
+                {% else %}
+                    für die Tags
+                    {% for tag in tags %}
+                        {% if not loop.last %}
+                            {{ tag.name }}{% if loop.index < (tags|length - 1) %},{% endif %}
+                        {% else %}
+                            {% if operator == 'or' %}oder{% else %}und{% endif %} {{ tag.name }}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endif %}
+            {% if location|default(false) %} für Ort „{{ location.name }}" <a class="location-edit"
+                                                                              href="{{ path("location_edit",{slug:location.slug}) }}"><i
+                        class="bi bi-pencil-square text-primary" data-content="Ort bearbeiten"
+                        title="Ort bearbeiten"></i> </a> {% endif %}
+        </h1>
+        {% if tags|default and tags|length == 1 %}
+            <a href="{{ path('tag_show',{'slug' : tags[0].slug }) }}.ics" class="btn btn-link"><i class="bi bi-calendar"></i> Link zur Kalenderdatei</a>
+        {% elseif(tags|default and tags|length > 1) %}
+        {% endif %}
+        {% if location|default(false) %}
+            {% if (location.description|length > 0) or location.hasAddress() %}
+                <div id="location-description" class="alert bg-light border-primary">
+                    {% if (location.description|length > 0) %}
+                        <p>{{ location.description|markdown_to_html }}</p>
+                    {% endif %}
+                    {% if (location.hasAddress()) %}
+                    {% endif %}
+                    {% if ((location.lon > 0) and (location.lat > 0)) %}
+                        <hr>
+                        <p>
+                            Anschrift:<br/>
+                            {{ location.streetaddress }}{% if(location.streetnumber|length > 0) %} {{ location.streetnumber }}{% endif %}
+                            <br/>
+                            {% if(location.zipcode|length > 0) %}{{ location.zipcode }} {% endif %}{{ location.city }}
+                        </p>
+                        <a href="/tags/{% for tag in tags %}{{ tag.slug }}{% if not loop.last %}{% if operator == 'or' %}|{% elseif(operator == 'and') %}&{% endif %}{% endif %}{% endfor %}.ics" class="btn btn-link"><i class="bi bi-calendar"></i> Link zur Kalenderdatei</a>
+                        <p><a href="#" class="btn btn-link show_map">Auf einer OpenStreetMap-Karte anzeigen</a></p>
+                        <div class="modal fade geo viewer" tabindex="-1" role="dialog">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">{{ location.name }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>{{ location.streetaddress }}{% if(location.streetnumber|length > 0) %} {{ location.streetnumber }}{% endif %}</p>
+                                        <p>{% if(location.zipcode|length > 0) %}{{ location.zipcode }} {% endif %}{{ location.city }}</p>
+                                        <div id="view-map" data-lat="{{ location.lat }}" data-lon="{{ location.lon }}"></div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    {% if entities|length > 0 %}
+        <div class="container mt-4">
+            <div class="row">
+                {% for entity in entities %}
+                    <div class="col-md-4 mb-4">
+                        {{ include('event/event_box.html.twig',{'truncate_summary':true}) }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div class="container mt-4">
+            <div class="alert alert-warning" role="alert">
+                Es konnten keine Termine gefunden werden.
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

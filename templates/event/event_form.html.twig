@@ -1,0 +1,168 @@
+<form method="post" id="event-form" class="needs-validation" novalidate
+      action="{% if entity.id|default(0) > 0 %}{{ path('_update',{'slug':entity.slug}) }}{% else %}{{ path('_create') }}{% endif %}">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="event_startdate" class="form-label">Startdatum</label>
+                <input type="datetime-local"
+                       id="event_startdate"
+                       name="startdate"
+                       required="required"
+                       value="{{ entity.startdate.format('Y-m-d\\TH:i')|default('') }}"
+                       placeholder="{{ "now"|date('Y-m-d\\TH:i') }}"
+                       class="form-control">
+                {% if errors.startdate is defined %}
+                    <div class="invalid-feedback d-block">{{ errors.startdate }}</div>
+                {% endif %}
+                <div class="form-text">
+                    Bitte gebe das Startdatum im Format <a href="http://de.wikipedia.org/wiki/ISO_8601">ISO 8601</a> an.
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="event_enddate" class="form-label">Enddatum</label>
+                <input type="datetime-local"
+                       id="event_enddate"
+                       name="enddate"
+                       value="{{ entity.enddate.format('Y-m-d\\TH:i')|default('') }}"
+                       placeholder="{{ "now"|date('Y-m-d\\TH:i') }}"
+                       class="form-control">
+                {% if errors.enddate is defined %}
+                    <div class="invalid-feedback d-block">{{ errors.enddate }}</div>
+                {% endif %}
+                <div class="form-text">
+                    Bitte gebe das Enddatum im Format <a href="http://de.wikipedia.org/wiki/ISO_8601">ISO 8601</a> an.
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="event_summary" class="form-label">Zusammenfassung</label>
+                <input type="text"
+                       id="event_summary"
+                       name="summary"
+                       value="{{ entity.summary|default('') }}"
+                       required="required"
+                       maxlength="255"
+                       class="form-control">
+                {% if errors.summary is defined %}
+                    <div class="invalid-feedback d-block">{{ errors.summary }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="event_url" class="form-label">URL</label>
+                <input type="url"
+                       id="event_url"
+                       name="url"
+                       maxlength="255"
+                       pattern="https?://.*"
+                       value="{{ entity.url|default('') }}"
+                       class="form-control">
+                <div class="form-text">
+                    Vergesse nicht das https:// zur URL anzugeben.
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="event_location" class="form-label">Ort</label>
+                <input type="text"
+                       id="event_location"
+                       name="location"
+                       maxlength="255"
+                       data-required="true"
+                       value="{{ entity.location.name|default('') }}"
+                       class="form-control">
+                <div class="invalid-feedback">
+                    Bitte gib einen Ort an.
+                </div>
+                
+                <input type="hidden" id="location_lat" name="location_lat" value="{{ entity.location.lat|default('') }}">
+                <input type="hidden" id="location_lon" name="location_lon" value="{{ entity.location.lon|default('') }}">
+                
+                <div id="location_details" class="mt-2 {% if not entity.location.lat|default(0) > 0 %}d-none{% endif %}">
+                    <div class="card">
+                        <div class="card-body py-2">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-geo-alt me-2 text-primary"></i>
+                                <div>
+                                    <div class="location-name">{{ entity.location.name|default('') }}</div>
+                                    <small class="text-muted location-coordinates">
+                                        {% if entity.location.lat|default(0) > 0 %}
+                                            Lat: {{ entity.location.lat }}, Lon: {{ entity.location.lon }}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-secondary ms-auto edit-on-map" title="Auf Karte bearbeiten">
+                                    <i class="bi bi-map"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-text mt-1">
+                    Nach Orten suchen oder <a href="#" class="add_geo">auf der Karte auswählen</a> (JavaScript erforderlich).
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="event_tags" class="form-label">Tags</label>
+                <input type="text"
+                       id="event_tags"
+                       name="tags"
+                       value="{{ entity.getTagsAsText|default(entity.tags|default('')) }}"
+                       class="form-control">
+                <div class="form-text">
+                    Du kannst hier kommasepariert <a href="https://en.wikipedia.org/wiki/Tag_%28metadata%29">Tags</a> angeben.
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="event_description" class="form-label">Beschreibung</label>
+                <textarea name="description" id="event_description" rows="10" class="form-control">{{ entity.description|default('') }}</textarea>
+                <div class="form-text">
+                    Du kannst hier <a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a> benutzen.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-3 oos">
+        <label for="event_origin" class="form-label">Origin</label>
+        <input type="text"
+               id="event_origin"
+               name="origin"
+               maxlength="255"
+               value="{{ entity.origin|default('') }}"
+               class="form-control">
+        <div class="form-text">
+            Origin URL (Screenreader: bitte leer lassen)
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Speichern</button>
+</form>
+
+<div class="modal fade" id="geoChooserModal" tabindex="-1" aria-labelledby="geoChooserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="geoChooserModalLabel">Wähle einen Punkt auf der Karte</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <p class="text-muted">Klicke auf die Karte, um den Standort zu setzen oder ziehe den Marker an die gewünschte Position.</p>
+                <div id="map" style="height: 400px; width: 100%;"></div>
+                <div class="mt-2">
+                    <small class="text-muted" id="modal-coordinates"></small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                <button type="button" class="btn btn-primary ok">Übernehmen</button>
+            </div>
+        </div>
+    </div>
+</div>

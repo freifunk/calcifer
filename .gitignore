@@ -1,12 +1,47 @@
-/web/bundles/
-/app/bootstrap.php.cache
-/app/cache/*
-/app/config/parameters.yml
-/app/logs/*
-!app/cache/.gitkeep
-!app/logs/.gitkeep
-/build/
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
 /vendor/
-/bin/
-/composer.phar
-app/calcifer.sqlite3
+###< symfony/framework-bundle ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+.phpunit.result.cache
+###< phpunit/phpunit ###
+
+###> symfony/phpunit-bridge ###
+.phpunit.result.cache
+/phpunit.xml
+###< symfony/phpunit-bridge ###
+
+###> symfony/asset-mapper ###
+/public/assets/
+/assets/vendor/
+###< symfony/asset-mapper ###
+
+### IDE-spezifische Verzeichnisse ###
+/.idea/
+/.vscode/
+/.netbeans/
+/.fleet/
+/.project
+/.buildpath
+/.settings/
+nbproject/
+*.sublime-workspace
+*.sublime-project
+.DS_Store
+
+### Projektspezifisch ###
+/old
+node_modules/
+/public/upload/
+/public/uploads/
+npm-debug.log
+yarn-error.log
+.env.test.local
+.php-cs-fixer.cache

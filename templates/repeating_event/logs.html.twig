@@ -1,0 +1,60 @@
+{% extends 'layout.html.twig' %}
+
+
+{% block body -%}
+    <div class="container my-4">
+        <h1 class="text-primary border-bottom pb-2">
+            Logeinträge für Wiederholende Termine
+        </h1>
+    </div>
+
+    <div class="container my-4">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Wiederholender Termin</th>
+                <th>Termin</th>
+                <th>Termin Startdatum</th>
+                <th>Termin Enddatum</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for entity in entities %}
+                {% set eventPath = null %}
+                {% set eventSummary = null %}
+                {% set hasValidEvent = false %}
+                
+                {% try %}
+                    {% set eventPath = path('_show', {'slug': entity.event.slug}) %}
+                    {% set eventSummary = entity.event.summary %}
+                    {% set hasValidEvent = true %}
+                {% catch %}
+                    {# Path generation failed, keeping hasValidEvent as false #}
+                {% endcatch %}
+                
+                <tr>
+                    <td>
+                        {{ entity.repeatingEvent.summary }}
+                    </td>
+                    <td>
+                        {% if hasValidEvent %}
+                            <a href="{{ eventPath }}">{{ eventSummary }}</a>
+                        {% else %}
+                            no event
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ entity.eventStartdate.format('Y-m-d H:i') }}
+                    </td>
+                    <td>
+                        {% if entity.eventEnddate %}
+                            {{ entity.eventEnddate.format('Y-m-d H:i') }}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

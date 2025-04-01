@@ -1,0 +1,33 @@
+{% extends 'layout.html.twig' %}
+
+{% block body -%}
+    <div class="container my-4">
+        <h1 class="text-primary border-bottom pb-2">
+            Wiederholungsmuster
+        </h1>
+    </div>
+
+    <div class="container my-4">
+        <div class="card">
+            <div class="card-body">
+                <p>Es gibt 2 verschiedene Wiederholungsmustertypen. Feste Termine oder Interval Termine.</p>
+
+                <p>Der erste definiert sich dadurch das der Termin immer an einem bestimmten Tag im Monat passieren soll.
+                    Das Hackspace-Plenum findet z.B. am „<code>Zweiter Freitag des Monats</code>" statt. Die
+                    Sicherheitssprechstunde findet immer am „<code>Erster Dienstag des Monats</code>" statt. Anhand dieser
+                    Beispiele sollte eigentlich klar sein wie dieses Wiederholungsmuster funktioniert:</p>
+
+                <p>An erster stelle definiert man die Woche: Erster, Zweiter, Dritter, Letzter (In manchen Fällen kann
+                    Dritter und Letzter auch identisch sein).</p>
+
+                <p>An zweiter stelle definiert man den Wochentag: Montag, Dienstag, Mitwoch usw.</p>
+
+                <p>An letzter Stelle steht noch pro Forma „des Monats"</p>
+
+                <p>Der zweite Wiederholungstyp ist für regelmäßige Termine wie z.B. die Elektrorunde gedacht, die „<code>Alle
+                        7 Tage</code>". Für die Brettspielerei würde man „<code>Alle 2 Wochen</code>" schreiben.</p>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
