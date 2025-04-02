@@ -36,7 +36,10 @@ class RepeatingEventControllerTest extends WebTestCase
             $event = new RepeatingEvent();
             $event->setSummary('Test Wiederholendes Event');
             $event->setSlug('test-wiederholendes-event');
+            
+            // RepeatingEvent erwartet jetzt ein DateTimeImmutable, also verwenden wir die setNextdate-Methode richtig
             $event->setNextdate(new \DateTime('+1 day'));
+            
             $event->setRepeatingPattern('Jede Woche');
             $event->setDuration(60);
             $event->setDescription('Ein Test-Event für automatisierte Tests');

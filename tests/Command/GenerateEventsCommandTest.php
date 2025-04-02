@@ -11,10 +11,12 @@ use App\Entity\RepeatingEventLogEntry;
 use App\Repository\EventRepository;
 use App\Repository\RepeatingEventRepository;
 use App\Service\SluggerService;
+use App\Service\TimeZoneService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use App\Entity\Tag;
 
 class GenerateEventsCommandTest extends KernelTestCase
 {
@@ -32,12 +34,14 @@ class GenerateEventsCommandTest extends KernelTestCase
         $this->repeatingEventRepository = $container->get(RepeatingEventRepository::class);
         $this->eventRepository = $container->get(EventRepository::class);
         $sluggerService = $container->get(SluggerService::class);
+        $timeZoneService = $container->get(\App\Service\TimeZoneService::class);
 
         $this->command = new GenerateEventsCommand(
             $this->entityManager,
             $this->repeatingEventRepository,
             $this->eventRepository,
-            $sluggerService
+            $sluggerService,
+            $timeZoneService
         );
         
         // Stelle sicher, dass der Test mit einer leeren DB startet

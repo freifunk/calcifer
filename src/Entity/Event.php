@@ -293,16 +293,27 @@ class Event extends BaseEntity
             $uid = "https://localhost/termine/{$this->getSlug()}";
         }
 
+        // Zugriff auf DefaultTimeZone über den Container
+        $tzBerlin = self::getDefaultTimeZone();
+        
+        // DateTime-Objekte mit korrekter Zeitzone
+        $dtstart = clone $this->startdate;
+        $dtstart->setTimezone($tzBerlin);
+        
         $event = [
             'SUMMARY' => $this->summary,
-            'DTSTART' => $this->startdate,
+            'DTSTART' => $dtstart,
             'DESCRIPTION' => $this->description,
             'URL' => $this->getUrl(),
             'CATEGORIES' => $categories,
             'UID' => $uid,
         ];
-        if (!is_null($this->enddate))
-            $event["DTEND"] = $this->getEnddate();
+        
+        if (!is_null($this->enddate)) {
+            $dtend = clone $this->enddate;
+            $dtend->setTimezone($tzBerlin);
+            $event["DTEND"] = $dtend;
+        }
 
         if ($this->location instanceof Location) {
             $event["LOCATION"] = $this->location->getName();
@@ -318,5 +329,28 @@ class Event extends BaseEntity
         }
 
         return $event;
+    }
+    
+    /**
+     * Hilfsmethode, um die Standard-Zeitzone zu erhalten
+     * Diese Methode ermöglicht den Zugriff auf die konfigurierte Zeitzone ohne direkte Dependency Injection
+     * in der Entity (was in Symfony nicht unterstützt wird)
+     */
+    public static function getDefaultTimeZone(): \DateTimeZone
+    {
+        // In einer statischen Methode können wir nicht auf $this zugreifen
+        global $kernel;
+        
+        if ($kernel) {
+            try {
+                $timeZoneService = $kernel->getContainer()->get('App\Service\TimeZoneService');
+                return $timeZoneService->getDefaultTimeZone();
+            } catch (\Exception $e) {
+                // Fallback, falls der Service nicht verfügbar ist
+            }
+        }
+        
+        // Fallback zur Standard-Zeitzone
+        return new \DateTimeZone('Europe/Berlin');
     }
 }

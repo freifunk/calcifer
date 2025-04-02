@@ -154,7 +154,7 @@ class RepeatingEvent extends BaseEntity
         } else {
             $nextdate = $this->getNextdate();
             if ($nextdate instanceof DateTime) {
-                $nextdate->setTimezone(new DateTimeZone('Europe/Berlin'));
+                $nextdate->setTimezone(Event::getDefaultTimeZone());
                 $this->setNextdate($nextdate);
             }
             try {

@@ -51,6 +51,7 @@ class TagControllerTest extends WebTestCase
             $event = new Event();
             $event->setSummary('TagTest Event');
             $event->setStartdate(new \DateTime('+1 day'));
+            $event->setEnddate(new \DateTime('+26 hour'));
             $event->setSlug('tagtest-event');
             
             // Tags hinzufügen
@@ -210,6 +211,14 @@ class TagControllerTest extends WebTestCase
         $this->assertStringContainsString('SUMMARY:', $content);
         $this->assertStringContainsString('END:VEVENT', $content);
         $this->assertStringContainsString('END:VCALENDAR', $content);
+        
+        // Überprüfe, ob TZID-Parameter für Europe/Berlin gesetzt sind
+        $this->assertStringContainsString('TZID=Europe/Berlin', $content, 
+            'Die ICS-Datei sollte Zeitzonenattribute für Europe/Berlin enthalten');
+        $this->assertMatchesRegularExpression('/DTSTART;TZID=Europe\/Berlin:[0-9]{8}T[0-9]{6}/', $content, 
+            'DTSTART sollte das TZID-Format mit Europe/Berlin verwenden');
+        $this->assertMatchesRegularExpression('/DTEND;TZID=Europe\/Berlin:[0-9]{8}T[0-9]{6}/', $content, 
+            'DTEND sollte das TZID-Format mit Europe/Berlin verwenden');
     }
     
     /**

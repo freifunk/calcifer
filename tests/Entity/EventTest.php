@@ -93,6 +93,44 @@ class EventTest extends KernelTestCase
         $this->assertArrayHasKey('enddate', $errors);
     }
     
+    public function testConvertToCalendarEvent(): void
+    {
+        $event = new Event();
+        $event->setSummary('Testtitel');
+        $event->setDescription('Testbeschreibung');
+        $event->setUrl('https://example.org');
+        
+        // Datum mit einer bestimmten Zeitzone
+        $startDate = new DateTime('2023-10-01 15:00', new \DateTimeZone('UTC'));
+        $endDate = new DateTime('2023-10-01 17:30', new \DateTimeZone('UTC'));
+        $event->setStartdate($startDate);
+        $event->setEnddate($endDate);
+        
+        // Location hinzufügen
+        $location = new Location();
+        $location->setName('Testort');
+        $location->setLat(50.123);
+        $location->setLon(10.456);
+        $event->setLocation($location);
+        
+        // Event konvertieren
+        $calendarEvent = $event->convertToCalendarEvent();
+        
+        // Prüfen der Grundstruktur
+        $this->assertEquals('Testtitel', $calendarEvent['SUMMARY']);
+        $this->assertEquals('Testbeschreibung', $calendarEvent['DESCRIPTION']);
+        $this->assertEquals('https://example.org', $calendarEvent['URL']);
+        $this->assertEquals('Testort', $calendarEvent['LOCATION']);
+        $this->assertEquals([50.123, 10.456], $calendarEvent['GEO']);
+        
+        // TZID-Eigenschaften prüfen
+        $this->assertInstanceOf(DateTime::class, $calendarEvent['DTSTART']);
+        $this->assertEquals('Europe/Berlin', $calendarEvent['DTSTART']->getTimezone()->getName());
+        
+        $this->assertInstanceOf(DateTime::class, $calendarEvent['DTEND']);
+        $this->assertEquals('Europe/Berlin', $calendarEvent['DTEND']->getTimezone()->getName());
+    }
+    
     protected function tearDown(): void
     {
         parent::tearDown();

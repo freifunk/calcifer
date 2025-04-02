@@ -8,6 +8,7 @@ use App\Entity\RepeatingEventLogEntry;
 use App\Repository\EventRepository;
 use App\Repository\RepeatingEventRepository;
 use App\Service\SluggerService;
+use App\Service\TimeZoneService;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
@@ -32,7 +33,8 @@ class GenerateEventsCommand extends Command
         private readonly EntityManagerInterface $entityManager,
         private readonly RepeatingEventRepository $repeatingEventRepository,
         private readonly EventRepository $eventRepository, 
-        private readonly SluggerService $sluggerService
+        private readonly SluggerService $sluggerService,
+        private readonly TimeZoneService $timeZoneService
     ) {
         parent::__construct();
     }
@@ -84,7 +86,7 @@ class GenerateEventsCommand extends Command
                 $nextDate = $dateObj;
             }
             
-            $nextDate->setTimezone(new DateTimeZone('Europe/Berlin'));
+            $nextDate->setTimezone($this->timeZoneService->getDefaultTimeZone());
             
             $parser = new RelativeDateParser(
                 $repeatingEvent->getRepeatingPattern(),
