@@ -4,6 +4,7 @@ namespace App\Tests\Service;
 
 use App\Entity\Event;
 use App\Entity\Tag;
+use App\Entity\RepeatingEventLogEntry;
 use App\Repository\EventRepository;
 use App\Repository\TagRepository;
 use App\Service\EventService;
@@ -14,6 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use PHPUnit\Framework\TestCase;
+use App\Repository\RepeatingEventLogRepository;
 
 class EventServiceTest extends TestCase
 {
@@ -24,6 +26,7 @@ class EventServiceTest extends TestCase
     private $service;
     private $queryBuilder;
     private $query;
+    private $repeatingEventLogRepository;
 
     protected function setUp(): void
     {
@@ -33,12 +36,14 @@ class EventServiceTest extends TestCase
         $this->sluggerService = $this->createMock(SluggerService::class);
         $this->queryBuilder = $this->createMock(QueryBuilder::class);
         $this->query = $this->createMock(Query::class);
+        $this->repeatingEventLogRepository = $this->createMock(RepeatingEventLogRepository::class);
         
         $this->service = new EventService(
             $this->entityManager, 
             $this->eventRepository,
             $this->tagRepository,
-            $this->sluggerService
+            $this->sluggerService,
+            $this->repeatingEventLogRepository
         );
     }
 
@@ -134,6 +139,12 @@ class EventServiceTest extends TestCase
     {
         $event = new Event();
         
+        $this->repeatingEventLogRepository
+            ->expects($this->once())
+            ->method('findBy')
+            ->with(['event' => $event])
+            ->willReturn([]);
+        
         $this->entityManager
             ->expects($this->once())
             ->method('remove')
@@ -141,6 +152,38 @@ class EventServiceTest extends TestCase
         
         $this->entityManager
             ->expects($this->once())
+            ->method('flush');
+        
+        $this->service->delete($event);
+    }
+    
+    public function testDeleteWithLogEntries(): void
+    {
+        $event = new Event();
+        
+        // Mock log entries
+        $logEntry1 = new RepeatingEventLogEntry();
+        $logEntry1->setEventsId($event->getId());
+        $logEntry1->setEvent($event);
+        $logEntries = [$logEntry1];
+        
+        // Configure repeatingEventLogRepository to return the log entries
+        $this->repeatingEventLogRepository
+            ->expects($this->once())
+            ->method('findBy')
+            ->with(['event' => $event])
+            ->willReturn($logEntries);
+        
+        // Da es schwierig ist, die genaue Reihenfolge zu testen, überprüfen wir stattdessen
+        // dass die remove-Methode mindestens zweimal aufgerufen wird
+        // (einmal für das LogEntry und einmal für das Event)
+        $this->entityManager
+            ->expects($this->atLeast(2))
+            ->method('remove');
+        
+        // flush() sollte zweimal aufgerufen werden
+        $this->entityManager
+            ->expects($this->exactly(2))
             ->method('flush');
         
         $this->service->delete($event);
