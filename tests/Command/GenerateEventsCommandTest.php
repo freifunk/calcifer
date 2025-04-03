@@ -148,6 +148,68 @@ class GenerateEventsCommandTest extends KernelTestCase
                 "Events should be 14 days apart. Actual dates: {$firstDate->format('Y-m-d')} and {$secondDate->format('Y-m-d')}");
         }
     }
+
+    /**
+     * Testet die korrekte Zeitzonenbehandlung bei der Event-Generierung
+     */
+    public function testTimezoneHandling(): void
+    {
+        // Erstelle eine Location für den Test
+        $location = new Location();
+        $location->setName('Test Location');
+        $location->setSlug('test-location');
+        $this->entityManager->persist($location);
+        $this->entityManager->flush();
+
+        // Erstelle ein wiederkehrendes Event mit einer bestimmten Startzeit
+        $startDate = new DateTime('2024-04-01 15:00:00', new \DateTimeZone('Europe/Berlin'));
+        $repeatingEvent = new RepeatingEvent();
+        $repeatingEvent->setRepeatingPattern('Alle 14 Tage');
+        $repeatingEvent->setNextdate($startDate);
+        $repeatingEvent->setSummary('Timezone Test Event');
+        $repeatingEvent->setDescription('This event tests timezone handling');
+        $repeatingEvent->setLocation($location);
+        $repeatingEvent->setDuration(60);
+        $repeatingEvent->setSlug('timezone-test-event');
+        
+        $this->entityManager->persist($repeatingEvent);
+        $this->entityManager->flush();
+        
+        // Führe den Command aus
+        $commandTester = new CommandTester($this->command);
+        $commandTester->execute([
+            '--duration' => '1 month'
+        ]);
+        
+        // Überprüfe das Ergebnis
+        $this->assertEquals(0, $commandTester->getStatusCode());
+        
+        // Hole die generierten Events
+        $events = $this->eventRepository->findBy(['summary' => 'Timezone Test Event']);
+        $this->assertGreaterThanOrEqual(2, count($events));
+        
+        // Überprüfe die Zeitzonen der Events
+        foreach ($events as $event) {
+            $this->assertEquals('Europe/Berlin', $event->getStartdate()->getTimezone()->getName());
+            
+            // Überprüfe, dass die Uhrzeit korrekt ist (15:00)
+            $this->assertEquals('15:00', $event->getStartdate()->format('H:i'));
+            
+            // Überprüfe die Log-Einträge
+            $logEntries = $this->entityManager->getRepository(RepeatingEventLogEntry::class)
+                ->findBy(['event' => $event]);
+            
+            foreach ($logEntries as $logEntry) {
+                $this->assertEquals('Europe/Berlin', $logEntry->getEventStartdate()->getTimezone()->getName());
+                $this->assertEquals('15:00', $logEntry->getEventStartdate()->format('H:i'));
+                
+                if ($logEntry->getEventEnddate()) {
+                    $this->assertEquals('Europe/Berlin', $logEntry->getEventEnddate()->getTimezone()->getName());
+                    $this->assertEquals('16:00', $logEntry->getEventEnddate()->format('H:i'));
+                }
+            }
+        }
+    }
     
     /**
      * Teste die Generierung von Events, ohne auf RelativeDateParser zu vertrauen
