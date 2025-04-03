@@ -6,6 +6,7 @@ use App\Entity\Event;
 use App\Entity\Tag;
 use App\Repository\EventRepository;
 use App\Repository\TagRepository;
+use App\Repository\RepeatingEventLogRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -18,7 +19,8 @@ class EventService
         private readonly EntityManagerInterface $entityManager,
         private readonly EventRepository $eventRepository,
         private readonly TagRepository $tagRepository,
-        private readonly SluggerService $sluggerService
+        private readonly SluggerService $sluggerService,
+        private readonly RepeatingEventLogRepository $repeatingEventLogRepository
     ) {}
 
     /**
@@ -73,6 +75,18 @@ class EventService
      */
     public function delete(Event $event, bool $flush = true): void
     {
+        // Zuerst Logeinträge löschen, die auf dieses Event verweisen
+        $logEntries = $this->repeatingEventLogRepository->findBy(['event' => $event]);
+        foreach ($logEntries as $logEntry) {
+            $this->entityManager->remove($logEntry);
+        }
+        
+        // Optional hier ein Zwischenflushen einfügen, wenn viele Logeinträge vorhanden sind
+        if (count($logEntries) > 0 && $flush) {
+            $this->entityManager->flush();
+        }
+        
+        // Dann das Event selbst löschen
         $this->entityManager->remove($event);
         
         if ($flush) {
