@@ -172,7 +172,8 @@ class RepeatingEventController extends AbstractController
         
         $nextdate = $request->get('nextdate');
         if ($nextdate) {
-            $entity->setNextdate(new DateTime($nextdate));
+            $dateTime = new DateTime($nextdate, new \DateTimeZone('Europe/Berlin'));
+            $entity->setNextdate($dateTime);
         }
     }
 

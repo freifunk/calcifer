@@ -91,9 +91,6 @@ class GenerateEventsCommand extends Command
                 $nextDate = clone $dateObj;
             }
             
-            // Stelle sicher, dass die Zeitzone korrekt gesetzt ist
-            $nextDate->setTimezone($defaultTz);
-            
             $parser = new RelativeDateParser(
                 $repeatingEvent->getRepeatingPattern(),
                 $nextDate,
@@ -103,25 +100,15 @@ class GenerateEventsCommand extends Command
             $lastEvent = null;
             
             while (($nextDate = $parser->getNext()) < $end) {
-                /** @var DateTime $nextDate */
-                
-                // Stelle sicher, dass die Zeitzone für nextDate korrekt ist
-                $nextDate->setTimezone($defaultTz);
-                
+                /** @var DateTime $nextDate */                
                 $event = new Event();
                 $event->setLocation($repeatingEvent->getLocation());
-                
-                // Explizites Klonen mit korrekter Zeitzone
-                $eventStartDate = clone $nextDate;
-                $eventStartDate->setTimezone($defaultTz);
-                $event->setStartdate($eventStartDate);
+                $event->setStartdate($nextDate);
                 
                 if ($repeatingEvent->getDuration() > 0) {
                     $durationInterval = new DateInterval('PT' . $repeatingEvent->getDuration() . 'M');
                     $endDate = clone $nextDate;
                     $endDate->add($durationInterval);
-                    // Stelle sicher, dass auch das Enddatum die richtige Zeitzone hat
-                    $endDate->setTimezone($defaultTz);
                     $event->setEnddate($endDate);
                 }
                 
@@ -148,23 +135,16 @@ class GenerateEventsCommand extends Command
                 $logEntry->setEvent($event);
                 $logEntry->setRepeatingEvent($repeatingEvent);
                 
-                // Setze die Startzeit mit korrekter Zeitzone
-                $logEntryStartDate = clone $event->getStartdate();
-                $logEntryStartDate->setTimezone($defaultTz);
-                $logEntry->setEventStartdate($logEntryStartDate);
+;
+                $logEntry->setEventStartdate($event->getStartdate());
                 
-                // Setze die Endzeit mit korrekter Zeitzone, falls vorhanden
                 if ($event->getEnddate()) {
-                    $logEntryEndDate = clone $event->getEnddate();
-                    $logEntryEndDate->setTimezone($defaultTz);
-                    $logEntry->setEventEnddate($logEntryEndDate);
+                    $logEntry->setEventEnddate($event->getEnddate());
                 }
                 
                 $this->entityManager->persist($logEntry);
                 $this->entityManager->flush();
                 
-                // Stelle sicher, dass die Zeitzone für den Parser korrekt ist
-                $nextDate->setTimezone($defaultTz);
                 $parser->setNow($nextDate);
                 
                 $lastEvent = $event;
@@ -174,7 +154,6 @@ class GenerateEventsCommand extends Command
             // Update next date in repeating event with correct timezone
             if ($lastEvent) {
                 $newNextDate = clone $lastEvent->getStartdate();
-                $newNextDate->setTimezone($defaultTz);
                 $repeatingEvent->setNextdate($newNextDate);
                 $this->entityManager->persist($repeatingEvent);
                 $this->entityManager->flush();

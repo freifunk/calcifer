@@ -221,6 +221,11 @@ class RepeatingEventControllerTest extends WebTestCase
         $this->assertEquals($updatedPattern, $updatedEvent->getRepeatingPattern(), 'Wiederholungsmuster wurde nicht aktualisiert');
         $this->assertEquals($updatedDescription, $updatedEvent->getDescription(), 'Beschreibung wurde nicht aktualisiert');
         $this->assertEquals(90, $updatedEvent->getDuration(), 'Dauer wurde nicht aktualisiert');
+        $this->assertEquals(
+            $nextDate->format('Y-m-d H:i'), 
+            $updatedEvent->getNextdate()->format('Y-m-d H:i'), 
+            'Nächster Termin wurde nicht aktualisiert'
+        );
         $this->assertEquals($updatedUrl, $updatedEvent->getUrl(), 'URL wurde nicht aktualisiert');
     }
     

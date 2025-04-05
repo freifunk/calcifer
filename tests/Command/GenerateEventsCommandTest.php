@@ -101,6 +101,7 @@ class GenerateEventsCommandTest extends KernelTestCase
 
         // Aktuelles Datum für das Test-Event
         $startDate = new DateTime('today');
+        $originalStartTimestamp = $startDate->getTimestamp();
 
         // Erstelle ein wiederkehrendes Event mit einem 14-tägigen Muster
         $repeatingEvent = new RepeatingEvent();
@@ -138,15 +139,46 @@ class GenerateEventsCommandTest extends KernelTestCase
                 return $a->getStartdate() <=> $b->getStartdate();
             });
             
-            // Berechne Abstand in Tagen zwischen aufeinanderfolgenden Events
+            // Berechne Abstand in Sekunden zwischen aufeinanderfolgenden Events
             $firstDate = $events[0]->getStartdate();
             $secondDate = $events[1]->getStartdate();
             
-            $daysDifference = $firstDate->diff($secondDate)->days;
+            $secondsDifference = $secondDate->getTimestamp() - $firstDate->getTimestamp();
+            $expectedSeconds = 14 * 24 * 60 * 60; // 14 Tage in Sekunden
             
-            $this->assertEquals(14, $daysDifference, 
-                "Events should be 14 days apart. Actual dates: {$firstDate->format('Y-m-d')} and {$secondDate->format('Y-m-d')}");
+            $this->assertEquals(
+                $expectedSeconds, 
+                $secondsDifference,
+                sprintf(
+                    "Events should be exactly 14 days apart. First: %s, Second: %s, Difference: %s seconds (expected %s seconds)",
+                    $firstDate->format('Y-m-d H:i:s'),
+                    $secondDate->format('Y-m-d H:i:s'),
+                    $secondsDifference,
+                    $expectedSeconds
+                )
+            );
         }
+        
+        // Überprüfen, ob nextDate im RepeatingEvent aktualisiert wurde
+        $this->entityManager->refresh($repeatingEvent);
+        $newNextDate = $repeatingEvent->getNextdate();
+        $newNextTimestamp = $newNextDate->getTimestamp();
+        
+        // Berechne die erwartete Differenz: 28 Tage (2 mal 14 Tage)
+        $expectedDifference = 28 * 24 * 60 * 60; // 28 Tage in Sekunden
+        $actualDifference = $newNextTimestamp - $originalStartTimestamp;
+        
+        $this->assertEquals(
+            $expectedDifference,
+            $actualDifference,
+            sprintf(
+                "RepeatingEvent nextDate should be exactly 28 days after original date. Original: %s, New: %s, Difference: %s seconds (expected %s seconds)",
+                date('Y-m-d H:i:s', $originalStartTimestamp),
+                $newNextDate->format('Y-m-d H:i:s'),
+                $actualDifference,
+                $expectedDifference
+            )
+        );
     }
 
     /**
@@ -162,7 +194,7 @@ class GenerateEventsCommandTest extends KernelTestCase
         $this->entityManager->flush();
 
         // Erstelle ein wiederkehrendes Event mit einer bestimmten Startzeit
-        $startDate = new DateTime('2024-04-01 15:00:00', new \DateTimeZone('Europe/Berlin'));
+        $startDate = new DateTime('2025-09-03 20:00:00', new \DateTimeZone('Europe/Berlin'));
         $repeatingEvent = new RepeatingEvent();
         $repeatingEvent->setRepeatingPattern('Alle 14 Tage');
         $repeatingEvent->setNextdate($startDate);
@@ -178,7 +210,7 @@ class GenerateEventsCommandTest extends KernelTestCase
         // Führe den Command aus
         $commandTester = new CommandTester($this->command);
         $commandTester->execute([
-            '--duration' => '1 month'
+            '--duration' => '6 months'
         ]);
         
         // Überprüfe das Ergebnis
@@ -193,7 +225,7 @@ class GenerateEventsCommandTest extends KernelTestCase
             $this->assertEquals('Europe/Berlin', $event->getStartdate()->getTimezone()->getName());
             
             // Überprüfe, dass die Uhrzeit korrekt ist (15:00)
-            $this->assertEquals('15:00', $event->getStartdate()->format('H:i'));
+            $this->assertEquals('20:00', $event->getStartdate()->format('H:i'));
             
             // Überprüfe die Log-Einträge
             $logEntries = $this->entityManager->getRepository(RepeatingEventLogEntry::class)
@@ -201,13 +233,17 @@ class GenerateEventsCommandTest extends KernelTestCase
             
             foreach ($logEntries as $logEntry) {
                 $this->assertEquals('Europe/Berlin', $logEntry->getEventStartdate()->getTimezone()->getName());
-                $this->assertEquals('15:00', $logEntry->getEventStartdate()->format('H:i'));
+                $this->assertEquals('20:00', $logEntry->getEventStartdate()->format('H:i'));
                 
                 if ($logEntry->getEventEnddate()) {
                     $this->assertEquals('Europe/Berlin', $logEntry->getEventEnddate()->getTimezone()->getName());
-                    $this->assertEquals('16:00', $logEntry->getEventEnddate()->format('H:i'));
+                    $this->assertEquals('21:00', $logEntry->getEventEnddate()->format('H:i'));
                 }
             }
+
+            $repeatingEvent = $this->repeatingEventRepository->findOneBy(['duration' => 60]);
+            $this->assertEquals('Europe/Berlin', $repeatingEvent->getNextdate()->getTimezone()->getName());
+            $this->assertEquals('20:00', $repeatingEvent->getNextdate()->format('H:i'));
         }
     }
     
