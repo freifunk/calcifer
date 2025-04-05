@@ -20,7 +20,13 @@ import './styles/app.css';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.min.css';
 
-
+// Überschreibe die Standard-Icon-URLs mit absoluten Pfaden
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconUrl: '/images/leaflet/marker-icon.png',
+  iconRetinaUrl: '/images/leaflet/marker-icon-2x.png',
+  shadowUrl: '/images/leaflet/marker-shadow.png'
+});
 
 document.addEventListener('DOMContentLoaded', function () {
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
