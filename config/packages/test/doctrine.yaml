@@ -1,8 +1,9 @@
 doctrine:
     dbal:
         # Verwende eine SQLite In-Memory-Datenbank für Tests
-        # driver: 'pdo_sqlite'
+        driver: 'pdo_sqlite'
         url: '%env(resolve:DATABASE_URL)%'
+        memory: true
     
     orm:
         auto_generate_proxy_classes: true
