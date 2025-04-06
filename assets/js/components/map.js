@@ -84,6 +84,25 @@ function initializeMap() {
 
 // Karten-Funktionalität
 function setupMapEventHandlers() {
+    // Event-Listener für manuelle Eingabe der Geokoordinaten
+    $(document).on('change', '#location-geocords', function() {
+        const geocordsValue = $(this).val();
+        if (geocordsValue) {
+            const [lat, lon] = geocordsValue.split(',').map(coord => parseFloat(coord.trim()));
+            if (!isNaN(lat) && !isNaN(lon)) {
+                // Aktualisiere versteckte Felder
+                $('#location_lat').val(lat.toFixed(6));
+                $('#location_lon').val(lon.toFixed(6));
+                
+                // UI aktualisieren
+                $('.location-coordinates').text(`Lat: ${lat.toFixed(6)}, Lon: ${lon.toFixed(6)}`);
+                
+                // Details-Bereich anzeigen
+                $('#location_details').removeClass('d-none');
+            }
+        }
+    });
+
     // Öffnen des Geo-Modals
     $(document).off('click', '.add_geo, .edit-on-map').on('click', '.add_geo, .edit-on-map', function(e) {
         e.preventDefault();
@@ -141,12 +160,17 @@ function setupMapEventHandlers() {
         $('#location_lat').val(lat);
         $('#location_lon').val(lon);
         
+        // Auch das sichtbare Geocords-Feld aktualisieren, falls vorhanden
+        if ($('#location-geocords').length > 0) {
+            $('#location-geocords').val(`${lat},${lon}`);
+        }
+        
         // UI aktualisieren
         $('.location-coordinates').text(`Lat: ${lat}, Lon: ${lon}`);
         
         // Ortsname aktualisieren falls nötig
         if ($('.location-name').text().trim() === '') {
-            $('.location-name').text($('#event_location').val() || 'Ausgewählter Standort');
+            $('.location-name').text($('#location-name').val() || $('#event_location').val() || 'Ausgewählter Standort');
         }
         
         // Details-Bereich anzeigen
