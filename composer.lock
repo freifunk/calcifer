@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f41b0979ef8675f524aaae0351403481",
+    "content-hash": "e7a01e14ce4b5e18204f1bd5c3cd18ef",
     "packages": [
         {
             "name": "composer/semver",
@@ -6907,16 +6907,16 @@
         },
         {
             "name": "symfony/stimulus-bundle",
-            "version": "v2.25.2",
+            "version": "v2.26.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/stimulus-bundle.git",
-                "reference": "5a6aef0646119530da862d5afa1386ade3b9ed43"
+                "reference": "82c174ebe564e6ecc1412974b6380b86d450675f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/stimulus-bundle/zipball/5a6aef0646119530da862d5afa1386ade3b9ed43",
-                "reference": "5a6aef0646119530da862d5afa1386ade3b9ed43",
+                "url": "https://api.github.com/repos/symfony/stimulus-bundle/zipball/82c174ebe564e6ecc1412974b6380b86d450675f",
+                "reference": "82c174ebe564e6ecc1412974b6380b86d450675f",
                 "shasum": ""
             },
             "require": {
@@ -6956,7 +6956,7 @@
                 "symfony-ux"
             ],
             "support": {
-                "source": "https://github.com/symfony/stimulus-bundle/tree/v2.25.2"
+                "source": "https://github.com/symfony/stimulus-bundle/tree/v2.26.1"
             },
             "funding": [
                 {
@@ -6972,7 +6972,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-05-19T11:54:27+00:00"
+            "time": "2025-06-05T17:25:17+00:00"
         },
         {
             "name": "symfony/stopwatch",
