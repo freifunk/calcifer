@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "96d0d2836931250aa4842b720465affa",
+    "content-hash": "ac2771f7980cda697941126216cba3a6",
     "packages": [
         {
             "name": "composer/semver",
@@ -7681,16 +7681,16 @@
         },
         {
             "name": "symfony/ux-turbo",
-            "version": "v2.30.0",
+            "version": "v2.31.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/ux-turbo.git",
-                "reference": "c5e88c7e16713e84a2a35f36276ccdb05c2c78d8"
+                "reference": "06d5e4cf4573efe4faf648f3810a28c63684c706"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/ux-turbo/zipball/c5e88c7e16713e84a2a35f36276ccdb05c2c78d8",
-                "reference": "c5e88c7e16713e84a2a35f36276ccdb05c2c78d8",
+                "url": "https://api.github.com/repos/symfony/ux-turbo/zipball/06d5e4cf4573efe4faf648f3810a28c63684c706",
+                "reference": "06d5e4cf4573efe4faf648f3810a28c63684c706",
                 "shasum": ""
             },
             "require": {
@@ -7703,7 +7703,7 @@
             "require-dev": {
                 "dbrekelmans/bdi": "dev-main",
                 "doctrine/doctrine-bundle": "^2.4.3",
-                "doctrine/orm": "^2.8 | 3.0",
+                "doctrine/orm": "^2.8|^3.0",
                 "php-webdriver/webdriver": "^1.15",
                 "phpstan/phpstan": "^2.1.17",
                 "symfony/asset-mapper": "^6.4|^7.0|^8.0",
@@ -7760,7 +7760,7 @@
                 "turbo-stream"
             ],
             "support": {
-                "source": "https://github.com/symfony/ux-turbo/tree/v2.30.0"
+                "source": "https://github.com/symfony/ux-turbo/tree/v2.31.0"
             },
             "funding": [
                 {
@@ -7780,7 +7780,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-08-27T15:25:48+00:00"
+            "time": "2025-10-16T07:24:06+00:00"
         },
         {
             "name": "symfony/validator",
