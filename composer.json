@@ -14,7 +14,7 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "doctrine/dbal": "^4.2.4",
-        "doctrine/doctrine-bundle": "^2.15.0",
+        "doctrine/doctrine-bundle": "^3.0.0",
         "doctrine/doctrine-migrations-bundle": "^3.4.2",
         "doctrine/orm": "^3.5.0",
         "enko/relativedateparser": "^1.0",
