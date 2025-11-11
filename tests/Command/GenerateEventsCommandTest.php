@@ -30,7 +30,7 @@ class GenerateEventsCommandTest extends KernelTestCase
         self::bootKernel();
         $container = static::getContainer();
         
-        $this->entityManager = $container->get('doctrine.orm.entity_manager');
+        $this->entityManager = $container->get('doctrine.orm.default_entity_manager');
         $this->repeatingEventRepository = $container->get(RepeatingEventRepository::class);
         $this->eventRepository = $container->get(EventRepository::class);
         $sluggerService = $container->get(SluggerService::class);
