@@ -1,7 +1,7 @@
 doctrine:
     dbal:
-        # Verwende eine SQLite In-Memory-Datenbank für Tests
-        url: '%env(resolve:DATABASE_URL)%'
+        # Datei-basierte SQLite Testdatenbank, stabil über mehrere Kernel/Connections
+        url: 'sqlite:///%kernel.project_dir%/var/test.db'
     
     orm:
         auto_mapping: true
