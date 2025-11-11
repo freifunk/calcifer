@@ -18,7 +18,7 @@ if (file_exists(dirname(__DIR__).'/config/bootstrap.php')) {
 $kernel = new Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
 $kernel->boot();
 $container = $kernel->getContainer();
-$entityManager = $container->get('doctrine.orm.entity_manager');
+$entityManager = $container->get('doctrine.orm.default_entity_manager');
 $connection = $entityManager->getConnection();
 $dbPath = $kernel->getProjectDir() . '/var/test.db';
 
