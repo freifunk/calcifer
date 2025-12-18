@@ -15,7 +15,7 @@
         "ext-iconv": "*",
         "doctrine/dbal": "^4.4.1",
         "doctrine/doctrine-bundle": "^3.1.0",
-        "doctrine/doctrine-migrations-bundle": "^3.7.0",
+        "doctrine/doctrine-migrations-bundle": "^4.0.0",
         "doctrine/orm": "^3.5.8",
         "enko/relativedateparser": "^1.0",
         "gglnx/twig-try-catch": "^1.0",
