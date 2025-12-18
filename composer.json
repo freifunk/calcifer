@@ -17,7 +17,7 @@
         "doctrine/doctrine-bundle": "^3.1.0",
         "doctrine/doctrine-migrations-bundle": "^4.0.0",
         "doctrine/orm": "^3.5.8",
-        "enko/relativedateparser": "^1.0",
+        "enko/relativedateparser": "^2.0",
         "gglnx/twig-try-catch": "^1.0",
         "league/commonmark": "^2.8.0",
         "phpdocumentor/reflection-docblock": "^5.6.5",
@@ -105,7 +105,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "7.4.*"
+            "require": "8.0.*"
         }
     },
     "require-dev": {
